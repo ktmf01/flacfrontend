@@ -1,0 +1,204 @@
+#pragma once
+
+using namespace System;
+using namespace System::ComponentModel;
+using namespace System::Collections;
+using namespace System::Windows::Forms;
+using namespace System::Data;
+using namespace System::Diagnostics;
+using namespace System::Drawing;
+
+
+namespace FLACfrontend {
+
+	/// <summary>
+	/// Summary for Advanced_options
+	///
+	/// WARNING: If you change the name of this class, you will need to change the
+	///          'Resource File Name' property for the managed resource compiler tool
+	///          associated with all .resx files this class depends on.  Otherwise,
+	///          the designers will not be able to interact properly with localized
+	///          resources associated with this form.
+	/// </summary>
+	public ref class Advanced_options : public System::Windows::Forms::Form
+	{
+	public:
+		Advanced_options(void)
+		{
+			InitializeComponent();
+			//
+			//TODO: Add the constructor code here
+			//
+		}
+
+	protected:
+		/// <summary>
+		/// Clean up any resources being used.
+		/// </summary>
+		~Advanced_options()
+		{
+			if (components)
+			{
+				delete components;
+			}
+		}
+	private: System::Windows::Forms::Button^  btnCommandHelp;
+	private: System::Windows::Forms::GroupBox^  groupBox1;
+	public: System::Windows::Forms::TextBox^  txtCommandLine;
+
+	private: System::Windows::Forms::Button^  button1;
+	private: System::Windows::Forms::GroupBox^  groupBox2;
+	public: System::Windows::Forms::TextBox^  txtCuesheet;
+
+	private: System::Windows::Forms::Button^  btnCueSheet;
+	private: System::Windows::Forms::OpenFileDialog^  openCueSheet;
+	public: System::Windows::Forms::CheckBox^  chkIgnoreChunkSize;
+
+	protected: 
+
+	protected: 
+
+	private:
+		/// <summary>
+		/// Required designer variable.
+		/// </summary>
+		System::ComponentModel::Container ^components;
+
+#pragma region Windows Form Designer generated code
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		void InitializeComponent(void)
+		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(Advanced_options::typeid));
+			this->btnCommandHelp = (gcnew System::Windows::Forms::Button());
+			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->txtCommandLine = (gcnew System::Windows::Forms::TextBox());
+			this->button1 = (gcnew System::Windows::Forms::Button());
+			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->txtCuesheet = (gcnew System::Windows::Forms::TextBox());
+			this->btnCueSheet = (gcnew System::Windows::Forms::Button());
+			this->openCueSheet = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->chkIgnoreChunkSize = (gcnew System::Windows::Forms::CheckBox());
+			this->groupBox1->SuspendLayout();
+			this->groupBox2->SuspendLayout();
+			this->SuspendLayout();
+			// 
+			// btnCommandHelp
+			// 
+			this->btnCommandHelp->Location = System::Drawing::Point(214, 19);
+			this->btnCommandHelp->Name = L"btnCommandHelp";
+			this->btnCommandHelp->Size = System::Drawing::Size(107, 23);
+			this->btnCommandHelp->TabIndex = 0;
+			this->btnCommandHelp->Text = L"See complete help";
+			this->btnCommandHelp->UseVisualStyleBackColor = true;
+			this->btnCommandHelp->Click += gcnew System::EventHandler(this, &Advanced_options::btnCommandHelp_Click);
+			// 
+			// groupBox1
+			// 
+			this->groupBox1->Controls->Add(this->txtCommandLine);
+			this->groupBox1->Controls->Add(this->btnCommandHelp);
+			this->groupBox1->Location = System::Drawing::Point(13, 12);
+			this->groupBox1->Name = L"groupBox1";
+			this->groupBox1->Size = System::Drawing::Size(327, 56);
+			this->groupBox1->TabIndex = 1;
+			this->groupBox1->TabStop = false;
+			this->groupBox1->Text = L"Extra command line options";
+			// 
+			// txtCommandLine
+			// 
+			this->txtCommandLine->Location = System::Drawing::Point(7, 21);
+			this->txtCommandLine->Name = L"txtCommandLine";
+			this->txtCommandLine->Size = System::Drawing::Size(201, 20);
+			this->txtCommandLine->TabIndex = 1;
+			// 
+			// button1
+			// 
+			this->button1->Location = System::Drawing::Point(146, 158);
+			this->button1->Name = L"button1";
+			this->button1->Size = System::Drawing::Size(75, 23);
+			this->button1->TabIndex = 2;
+			this->button1->Text = L"OK";
+			this->button1->UseVisualStyleBackColor = true;
+			this->button1->Click += gcnew System::EventHandler(this, &Advanced_options::button1_Click);
+			// 
+			// groupBox2
+			// 
+			this->groupBox2->Controls->Add(this->txtCuesheet);
+			this->groupBox2->Controls->Add(this->btnCueSheet);
+			this->groupBox2->Location = System::Drawing::Point(13, 74);
+			this->groupBox2->Name = L"groupBox2";
+			this->groupBox2->Size = System::Drawing::Size(327, 54);
+			this->groupBox2->TabIndex = 3;
+			this->groupBox2->TabStop = false;
+			this->groupBox2->Text = L"Embed cuesheet (only for encoding)";
+			// 
+			// txtCuesheet
+			// 
+			this->txtCuesheet->Location = System::Drawing::Point(7, 20);
+			this->txtCuesheet->Name = L"txtCuesheet";
+			this->txtCuesheet->Size = System::Drawing::Size(201, 20);
+			this->txtCuesheet->TabIndex = 1;
+			// 
+			// btnCueSheet
+			// 
+			this->btnCueSheet->Location = System::Drawing::Point(214, 18);
+			this->btnCueSheet->Name = L"btnCueSheet";
+			this->btnCueSheet->Size = System::Drawing::Size(107, 23);
+			this->btnCueSheet->TabIndex = 0;
+			this->btnCueSheet->Text = L"Select cuesheet";
+			this->btnCueSheet->UseVisualStyleBackColor = true;
+			this->btnCueSheet->Click += gcnew System::EventHandler(this, &Advanced_options::btnCueSheet_Click);
+			// 
+			// openCueSheet
+			// 
+			this->openCueSheet->Filter = L"Cuesheet|*.cue";
+			// 
+			// chkIgnoreChunkSize
+			// 
+			this->chkIgnoreChunkSize->AutoSize = true;
+			this->chkIgnoreChunkSize->Location = System::Drawing::Point(30, 134);
+			this->chkIgnoreChunkSize->Name = L"chkIgnoreChunkSize";
+			this->chkIgnoreChunkSize->Size = System::Drawing::Size(286, 17);
+			this->chkIgnoreChunkSize->TabIndex = 7;
+			this->chkIgnoreChunkSize->Text = L"Ignore WAVE filesize (for files > 4GB, use with caution!)";
+			this->chkIgnoreChunkSize->UseVisualStyleBackColor = true;
+			// 
+			// Advanced_options
+			// 
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
+			this->ClientSize = System::Drawing::Size(352, 193);
+			this->ControlBox = false;
+			this->Controls->Add(this->chkIgnoreChunkSize);
+			this->Controls->Add(this->groupBox2);
+			this->Controls->Add(this->button1);
+			this->Controls->Add(this->groupBox1);
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
+			this->Name = L"Advanced_options";
+			this->Text = L"Advanced options";
+			this->groupBox1->ResumeLayout(false);
+			this->groupBox1->PerformLayout();
+			this->groupBox2->ResumeLayout(false);
+			this->groupBox2->PerformLayout();
+			this->ResumeLayout(false);
+			this->PerformLayout();
+
+		}
+#pragma endregion
+
+private: System::Void btnCommandHelp_Click(System::Object^  sender, System::EventArgs^  e) {
+				 Process::Start("cmd","/c flac -H & PAUSE");
+			 }
+
+private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+			 this->Visible = false;
+		 }
+private: System::Void btnCueSheet_Click(System::Object^  sender, System::EventArgs^  e) {
+			 openCueSheet->ShowDialog();
+			 txtCuesheet->Text = openCueSheet->FileName;
+		 }
+};
+}
