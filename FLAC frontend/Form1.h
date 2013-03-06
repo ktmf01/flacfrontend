@@ -59,8 +59,9 @@ namespace FLACfrontend {
 	private: System::Windows::Forms::GroupBox^  gbEncoding;
 
 	private: System::Windows::Forms::TextBox^  textLevel;
+	private: System::Windows::Forms::Label^  lblLevel;
 
-	private: System::Windows::Forms::Label^  label1;
+
 	private: System::Windows::Forms::TrackBar^  tbLevel;
 	private: System::Windows::Forms::CheckBox^  chkReplayGainAlbum;
 
@@ -73,13 +74,16 @@ namespace FLACfrontend {
 
 	private: System::Windows::Forms::Button^  btnSelectDirectory;
 	private: System::Windows::Forms::TextBox^  txtOutputDirectory;
+	private: System::Windows::Forms::Button^  btnOutputDirSameAsInput;
 
-	private: System::Windows::Forms::Button^  button1;
+
+
 	private: System::Windows::Forms::Button^  btnEncode;
 	private: System::Windows::Forms::Button^  btnDecode;
 	private: System::Windows::Forms::Button^  btnTest;
 	private: System::Windows::Forms::Button^  btnFingerprint;
-	private: System::Windows::Forms::Button^  button2;
+	private: System::Windows::Forms::Button^  btnExit;
+
 
 
 	private: System::Windows::Forms::GroupBox^  gbGeneral;
@@ -135,18 +139,18 @@ namespace FLACfrontend {
 			this->chkReplayGain = (gcnew System::Windows::Forms::CheckBox());
 			this->chkVerify = (gcnew System::Windows::Forms::CheckBox());
 			this->textLevel = (gcnew System::Windows::Forms::TextBox());
-			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->lblLevel = (gcnew System::Windows::Forms::Label());
 			this->tbLevel = (gcnew System::Windows::Forms::TrackBar());
 			this->dlgOutputDirectory = (gcnew System::Windows::Forms::FolderBrowserDialog());
 			this->gbOutputDir = (gcnew System::Windows::Forms::GroupBox());
-			this->button1 = (gcnew System::Windows::Forms::Button());
+			this->btnOutputDirSameAsInput = (gcnew System::Windows::Forms::Button());
 			this->btnSelectDirectory = (gcnew System::Windows::Forms::Button());
 			this->txtOutputDirectory = (gcnew System::Windows::Forms::TextBox());
 			this->btnEncode = (gcnew System::Windows::Forms::Button());
 			this->btnDecode = (gcnew System::Windows::Forms::Button());
 			this->btnTest = (gcnew System::Windows::Forms::Button());
 			this->btnFingerprint = (gcnew System::Windows::Forms::Button());
-			this->button2 = (gcnew System::Windows::Forms::Button());
+			this->btnExit = (gcnew System::Windows::Forms::Button());
 			this->gbGeneral = (gcnew System::Windows::Forms::GroupBox());
 			this->chkKeepForeign = (gcnew System::Windows::Forms::CheckBox());
 			this->chkOggFlac = (gcnew System::Windows::Forms::CheckBox());
@@ -221,7 +225,7 @@ namespace FLACfrontend {
 			this->gbEncoding->Controls->Add(this->chkReplayGain);
 			this->gbEncoding->Controls->Add(this->chkVerify);
 			this->gbEncoding->Controls->Add(this->textLevel);
-			this->gbEncoding->Controls->Add(this->label1);
+			this->gbEncoding->Controls->Add(this->lblLevel);
 			this->gbEncoding->Controls->Add(this->tbLevel);
 			this->gbEncoding->Location = System::Drawing::Point(12, 152);
 			this->gbEncoding->Name = L"gbEncoding";
@@ -279,14 +283,14 @@ namespace FLACfrontend {
 			this->ttHelp->SetToolTip(this->textLevel, L"The compression level, a higher level makes smaller files, but takes longer to en" 
 				L"code");
 			// 
-			// label1
+			// lblLevel
 			// 
-			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(10, 30);
-			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(36, 13);
-			this->label1->TabIndex = 1;
-			this->label1->Text = L"Level:";
+			this->lblLevel->AutoSize = true;
+			this->lblLevel->Location = System::Drawing::Point(10, 30);
+			this->lblLevel->Name = L"lblLevel";
+			this->lblLevel->Size = System::Drawing::Size(36, 13);
+			this->lblLevel->TabIndex = 1;
+			this->lblLevel->Text = L"Level:";
 			// 
 			// tbLevel
 			// 
@@ -302,7 +306,7 @@ namespace FLACfrontend {
 			// 
 			// gbOutputDir
 			// 
-			this->gbOutputDir->Controls->Add(this->button1);
+			this->gbOutputDir->Controls->Add(this->btnOutputDirSameAsInput);
 			this->gbOutputDir->Controls->Add(this->btnSelectDirectory);
 			this->gbOutputDir->Controls->Add(this->txtOutputDirectory);
 			this->gbOutputDir->Location = System::Drawing::Point(12, 292);
@@ -312,16 +316,16 @@ namespace FLACfrontend {
 			this->gbOutputDir->TabStop = false;
 			this->gbOutputDir->Text = L"Output directory (only for encoding and decoding)";
 			// 
-			// button1
+			// btnOutputDirSameAsInput
 			// 
-			this->button1->Location = System::Drawing::Point(375, 21);
-			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(85, 22);
-			this->button1->TabIndex = 2;
-			this->button1->Text = L"Same as input";
-			this->ttHelp->SetToolTip(this->button1, L"Set output directory the same as input directory");
-			this->button1->UseVisualStyleBackColor = true;
-			this->button1->Click += gcnew System::EventHandler(this, &Form1::button1_Click);
+			this->btnOutputDirSameAsInput->Location = System::Drawing::Point(375, 21);
+			this->btnOutputDirSameAsInput->Name = L"btnOutputDirSameAsInput";
+			this->btnOutputDirSameAsInput->Size = System::Drawing::Size(85, 22);
+			this->btnOutputDirSameAsInput->TabIndex = 2;
+			this->btnOutputDirSameAsInput->Text = L"Same as input";
+			this->ttHelp->SetToolTip(this->btnOutputDirSameAsInput, L"Set output directory the same as input directory");
+			this->btnOutputDirSameAsInput->UseVisualStyleBackColor = true;
+			this->btnOutputDirSameAsInput->Click += gcnew System::EventHandler(this, &Form1::btnOutputDirSameAsInput_Click);
 			// 
 			// btnSelectDirectory
 			// 
@@ -387,16 +391,16 @@ namespace FLACfrontend {
 			this->btnFingerprint->UseVisualStyleBackColor = true;
 			this->btnFingerprint->Click += gcnew System::EventHandler(this, &Form1::btnFingerprint_Click);
 			// 
-			// button2
+			// btnExit
 			// 
-			this->button2->Location = System::Drawing::Point(406, 351);
-			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(75, 23);
-			this->button2->TabIndex = 10;
-			this->button2->Text = L"E&xit";
-			this->ttHelp->SetToolTip(this->button2, L"Exit FLAC frontend");
-			this->button2->UseVisualStyleBackColor = true;
-			this->button2->Click += gcnew System::EventHandler(this, &Form1::button2_Click);
+			this->btnExit->Location = System::Drawing::Point(406, 351);
+			this->btnExit->Name = L"btnExit";
+			this->btnExit->Size = System::Drawing::Size(75, 23);
+			this->btnExit->TabIndex = 10;
+			this->btnExit->Text = L"E&xit";
+			this->ttHelp->SetToolTip(this->btnExit, L"Exit FLAC frontend");
+			this->btnExit->UseVisualStyleBackColor = true;
+			this->btnExit->Click += gcnew System::EventHandler(this, &Form1::btnExit_Click);
 			// 
 			// gbGeneral
 			// 
@@ -497,7 +501,7 @@ namespace FLACfrontend {
 			this->Controls->Add(this->btnHelp);
 			this->Controls->Add(this->gbDecoding);
 			this->Controls->Add(this->gbGeneral);
-			this->Controls->Add(this->button2);
+			this->Controls->Add(this->btnExit);
 			this->Controls->Add(this->btnFingerprint);
 			this->Controls->Add(this->btnTest);
 			this->Controls->Add(this->btnDecode);
@@ -558,7 +562,7 @@ private: System::Void btnSelectDirectory_Click(System::Object^  sender, System::
 				txtOutputDirectory->Text = dlgOutputDirectory->SelectedPath;
 
 		 }
-private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void btnOutputDirSameAsInput_Click(System::Object^  sender, System::EventArgs^  e) {
 			 txtOutputDirectory->Text = "<< Same as input directory >>";
 		 }
 
@@ -573,8 +577,9 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
-			 batch->WriteLine("chcp 65001");
+			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
+			 batch->WriteLine("chcp 65001");
 
 			 // Check whether possible
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == true && numberOfFiles > 50){
@@ -582,7 +587,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 				 return;
 			 }
 
-			 // Retrieve settings
+			 // Retrieve settings and transform to command-line options
 			  if(chkVerify->Checked == true)		command += "-V ";
 			  if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
 			  if(chkKeepForeign->Checked == true)	command += "--keep-foreign-metadata ";
@@ -595,15 +600,18 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 
 			  command += AdvDialog->txtCommandLine->Text + " ";
 
-
-			  if(txtOutputDirectory->Text != "<< Same as input directory >>")
-					  for(i=0; i<numberOfFiles; i++){
-						  fileTemp = "" + lstFiles->Items[i];
-						  fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
-						  fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
-						  batch->WriteLine(command + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"");
-					  }
-			  else if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false){
+			  
+			  if(txtOutputDirectory->Text != "<< Same as input directory >>"){
+				  // Proces each file seperate if output directory is specified
+				  for(i=0; i<numberOfFiles; i++){
+					  fileTemp = "" + lstFiles->Items[i];
+					  fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
+					  fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
+					  batch->WriteLine(command + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"");
+				  }
+			  } else if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false){
+				  // Proces files in batches of 50 if output directory is same as input
+				  // and (not-album) ReplayGain processing is required
 				  for(i=0; i<numberOfFiles; i++){
 					  if (i % 50 == 0){
 						  batch->WriteLine(tmpBatch);
@@ -613,6 +621,8 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 				  }
 				  batch->WriteLine(tmpBatch);
 			  } else {
+				  // Proces files in batches of 50 if output directory is same as input
+				  // and ReplayGain processing is not required or Album gain has to be calculated seperately
 				  for(i=0; i<numberOfFiles; i++){
 					  if (i % 50 == 0){
 						  batch->WriteLine(tmpBatch);
@@ -635,30 +645,36 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 				 batch->WriteLine(tmpBatch);
 			 }
 
+			 // Add pause to let console window stay 
 			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
 			 batch->Close();
 
+			 // Execute batch-file
 			 Process::Start(batchFileName);
 		 }
 
 
-private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void btnExit_Click(System::Object^  sender, System::EventArgs^  e) {
 			 this->Close();
 		 }
 private: System::Void btnAdvanced_Click(System::Object^  sender, System::EventArgs^  e) {
 			 AdvDialog->ShowDialog();
 		 }
 private: System::Void btnFingerprint_Click(System::Object^  sender, System::EventArgs^  e) {
-			 String ^ batchFileName = Path::GetTempPath() + "/flacfrontend.bat";
+			 // Let's first create some kind of BAT-file
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
 			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "@ECHO OFF";
+			 String ^ tmpBatch = "";
 			 String ^ command = "metaflac.exe --show-md5sum ";
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
+			 // Supress commands and set codepage to unicode
+			 batch->WriteLine("@ECHO OFF");
 			 batch->WriteLine("chcp 65001");
 			 
-
+			 // Proces files in batches of 50
 			 for(i=0; i<numberOfFiles; i++){
 				 if (i % 50 == 0){
 					batch->WriteLine(tmpBatch);
@@ -667,25 +683,33 @@ private: System::Void btnFingerprint_Click(System::Object^  sender, System::Even
 				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
 			 }
 			 batch->WriteLine(tmpBatch);
+			 // Add pause to let console window stay 
 			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
 			 batch->Close();
+
+			 // Execute batch-file
 			 Process::Start(batchFileName);
 		 }
 private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^  e) {
 			 ttHelp->Show("Place your mouse pointer over a specific option to get more information",btnHelp);
 		 }
 private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^  e) {
-			 String ^ batchFileName = Path::GetTempPath() + "/flacfrontend.bat";
+			 // Let's first create some kind of BAT-file
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
 			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "@ECHO OFF";
+			 String ^ tmpBatch = "";
 			 String ^ command = "flac.exe -t ";
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
+			 // Supress commands and set codepage to unicode
+			 batch->WriteLine("@ECHO OFF");
 			 batch->WriteLine("chcp 65001");
 
 			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
 			 
+			 // Process in batches of 50
 			 for(i=0; i<numberOfFiles; i++){
 				 if (i % 50 == 0){
 					batch->WriteLine(tmpBatch);
@@ -694,13 +718,17 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
 			 }
 			 batch->WriteLine(tmpBatch);
+			 // Add pause to let console window stay 
 			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
 			 batch->Close();
+
+			 // Execute batch-file
 			 Process::Start(batchFileName);
 		 }
 private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "/flacfrontend.bat";
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
 			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
 			 String ^ tmpBatch = "";
 			 String ^ command = "flac.exe -d ";
@@ -708,6 +736,7 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
+			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
 			 batch->WriteLine("chcp 65001");
 
@@ -720,14 +749,16 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			  command += AdvDialog->txtCommandLine->Text + " ";
 
 
-			  if(txtOutputDirectory->Text != "<< Same as input directory >>")
-					  for(i=0; i<numberOfFiles; i++){
+			  if(txtOutputDirectory->Text != "<< Same as input directory >>"){
+				  // Proces each file seperate if output directory is specified
+				  for(i=0; i<numberOfFiles; i++){
 						  fileTemp = "" + lstFiles->Items[i];
 						  fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
 						  fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ".wav";
 						  batch->WriteLine(command + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"");
 					  }
-			  else {
+			  } else {
+				  // Proces in batches of 50 if file is processed in same directory
 				  for(i=0; i<numberOfFiles; i++){
 					  if (i % 50 == 0){
 						  batch->WriteLine(tmpBatch);
@@ -738,30 +769,42 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 				  batch->WriteLine(tmpBatch);
 			  }
 
+			 // Add pause to let console window stay 
 			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
 			 batch->Close();
+
+			 // Execute batch-file
 			 Process::Start(batchFileName);
 		 }
 
 private: System::Void lstFiles_DragEnter(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e) {
+			 // Show user that dragdrop is possible
 			 if(e->Data->GetDataPresent(DataFormats::FileDrop))
 				 e->Effect = DragDropEffects::Link;
 			 else
 				 e->Effect = DragDropEffects::None;
 		 }
 private: System::Void lstFiles_DragDrop(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e) {
+			 // Get filedrop into array of strings
 			 array<String^>^ FileDropList = (array<String^>^)e->Data->GetData(DataFormats::FileDrop);
 			 String^ FileDropItem = "";
 			 String^ FileDropDirItem = "";
 			 String^ extension = "";
+
+			 // First process each item that has been dropped
 			 for each (String^ FileDropItem in FileDropList){
 				 if(Directory::Exists(FileDropItem)){
+					 // Check whether dropped item is directory and find all files in that directory
 					 for each (String^ FileDropDirItem in Directory::EnumerateFiles(FileDropItem,"*.*",SearchOption::AllDirectories)){			
 						extension = FileDropDirItem->Substring(FileDropDirItem->LastIndexOf(".")+1);
-						if((extension == "flac") || (extension == "oga") || (extension == "ogg") || (extension == "wav"))
+						if((extension == "flac") || (extension == "oga") || (extension == "ogg") || (extension == "wav")){
+							// In directory search, only add relevant files
 							lstFiles->Items->Add(FileDropDirItem);
+						}
 					}
 				} else {
+					// If not a directory, just add the dropped item
 					lstFiles->Items->Add(FileDropItem);
 				}
 			 }

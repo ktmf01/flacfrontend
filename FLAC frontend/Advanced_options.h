@@ -43,11 +43,15 @@ namespace FLACfrontend {
 			}
 		}
 	private: System::Windows::Forms::Button^  btnCommandHelp;
-	private: System::Windows::Forms::GroupBox^  groupBox1;
-	public: System::Windows::Forms::TextBox^  txtCommandLine;
+	private: System::Windows::Forms::GroupBox^  grpbExtraOptions;
 
-	private: System::Windows::Forms::Button^  button1;
-	private: System::Windows::Forms::GroupBox^  groupBox2;
+	public: System::Windows::Forms::TextBox^  txtCommandLine;
+	private: System::Windows::Forms::Button^  btnOK;
+	private: System::Windows::Forms::GroupBox^  grpbCuesheet;
+	public: 
+
+
+
 	public: System::Windows::Forms::TextBox^  txtCuesheet;
 
 	private: System::Windows::Forms::Button^  btnCueSheet;
@@ -73,16 +77,16 @@ namespace FLACfrontend {
 		{
 			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(Advanced_options::typeid));
 			this->btnCommandHelp = (gcnew System::Windows::Forms::Button());
-			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->grpbExtraOptions = (gcnew System::Windows::Forms::GroupBox());
 			this->txtCommandLine = (gcnew System::Windows::Forms::TextBox());
-			this->button1 = (gcnew System::Windows::Forms::Button());
-			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->btnOK = (gcnew System::Windows::Forms::Button());
+			this->grpbCuesheet = (gcnew System::Windows::Forms::GroupBox());
 			this->txtCuesheet = (gcnew System::Windows::Forms::TextBox());
 			this->btnCueSheet = (gcnew System::Windows::Forms::Button());
 			this->openCueSheet = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->chkIgnoreChunkSize = (gcnew System::Windows::Forms::CheckBox());
-			this->groupBox1->SuspendLayout();
-			this->groupBox2->SuspendLayout();
+			this->grpbExtraOptions->SuspendLayout();
+			this->grpbCuesheet->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// btnCommandHelp
@@ -95,16 +99,16 @@ namespace FLACfrontend {
 			this->btnCommandHelp->UseVisualStyleBackColor = true;
 			this->btnCommandHelp->Click += gcnew System::EventHandler(this, &Advanced_options::btnCommandHelp_Click);
 			// 
-			// groupBox1
+			// grpbExtraOptions
 			// 
-			this->groupBox1->Controls->Add(this->txtCommandLine);
-			this->groupBox1->Controls->Add(this->btnCommandHelp);
-			this->groupBox1->Location = System::Drawing::Point(13, 12);
-			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(327, 56);
-			this->groupBox1->TabIndex = 1;
-			this->groupBox1->TabStop = false;
-			this->groupBox1->Text = L"Extra command line options";
+			this->grpbExtraOptions->Controls->Add(this->txtCommandLine);
+			this->grpbExtraOptions->Controls->Add(this->btnCommandHelp);
+			this->grpbExtraOptions->Location = System::Drawing::Point(13, 12);
+			this->grpbExtraOptions->Name = L"grpbExtraOptions";
+			this->grpbExtraOptions->Size = System::Drawing::Size(327, 56);
+			this->grpbExtraOptions->TabIndex = 1;
+			this->grpbExtraOptions->TabStop = false;
+			this->grpbExtraOptions->Text = L"Extra command line options";
 			// 
 			// txtCommandLine
 			// 
@@ -113,26 +117,26 @@ namespace FLACfrontend {
 			this->txtCommandLine->Size = System::Drawing::Size(201, 20);
 			this->txtCommandLine->TabIndex = 1;
 			// 
-			// button1
+			// btnOK
 			// 
-			this->button1->Location = System::Drawing::Point(146, 158);
-			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(75, 23);
-			this->button1->TabIndex = 2;
-			this->button1->Text = L"OK";
-			this->button1->UseVisualStyleBackColor = true;
-			this->button1->Click += gcnew System::EventHandler(this, &Advanced_options::button1_Click);
+			this->btnOK->Location = System::Drawing::Point(146, 158);
+			this->btnOK->Name = L"btnOK";
+			this->btnOK->Size = System::Drawing::Size(75, 23);
+			this->btnOK->TabIndex = 2;
+			this->btnOK->Text = L"OK";
+			this->btnOK->UseVisualStyleBackColor = true;
+			this->btnOK->Click += gcnew System::EventHandler(this, &Advanced_options::btnOK_Click);
 			// 
-			// groupBox2
+			// grpbCuesheet
 			// 
-			this->groupBox2->Controls->Add(this->txtCuesheet);
-			this->groupBox2->Controls->Add(this->btnCueSheet);
-			this->groupBox2->Location = System::Drawing::Point(13, 74);
-			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Size = System::Drawing::Size(327, 54);
-			this->groupBox2->TabIndex = 3;
-			this->groupBox2->TabStop = false;
-			this->groupBox2->Text = L"Embed cuesheet (only for encoding)";
+			this->grpbCuesheet->Controls->Add(this->txtCuesheet);
+			this->grpbCuesheet->Controls->Add(this->btnCueSheet);
+			this->grpbCuesheet->Location = System::Drawing::Point(13, 74);
+			this->grpbCuesheet->Name = L"grpbCuesheet";
+			this->grpbCuesheet->Size = System::Drawing::Size(327, 54);
+			this->grpbCuesheet->TabIndex = 3;
+			this->grpbCuesheet->TabStop = false;
+			this->grpbCuesheet->Text = L"Embed cuesheet (only for encoding)";
 			// 
 			// txtCuesheet
 			// 
@@ -172,17 +176,17 @@ namespace FLACfrontend {
 			this->ClientSize = System::Drawing::Size(352, 193);
 			this->ControlBox = false;
 			this->Controls->Add(this->chkIgnoreChunkSize);
-			this->Controls->Add(this->groupBox2);
-			this->Controls->Add(this->button1);
-			this->Controls->Add(this->groupBox1);
+			this->Controls->Add(this->grpbCuesheet);
+			this->Controls->Add(this->btnOK);
+			this->Controls->Add(this->grpbExtraOptions);
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"Advanced_options";
 			this->Text = L"Advanced options";
-			this->groupBox1->ResumeLayout(false);
-			this->groupBox1->PerformLayout();
-			this->groupBox2->ResumeLayout(false);
-			this->groupBox2->PerformLayout();
+			this->grpbExtraOptions->ResumeLayout(false);
+			this->grpbExtraOptions->PerformLayout();
+			this->grpbCuesheet->ResumeLayout(false);
+			this->grpbCuesheet->PerformLayout();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -193,7 +197,7 @@ private: System::Void btnCommandHelp_Click(System::Object^  sender, System::Even
 				 Process::Start("cmd","/c flac -H & PAUSE");
 			 }
 
-private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void btnOK_Click(System::Object^  sender, System::EventArgs^  e) {
 			 this->Visible = false;
 		 }
 private: System::Void btnCueSheet_Click(System::Object^  sender, System::EventArgs^  e) {
