@@ -2,17 +2,14 @@
 ------                          COPYRIGHT                            ------
 ---------------------------------------------------------------------------
 
-This file is made available under the Creative Commons CC0 1.0 Universal
-Public Domain Dedication.
-
-The person who associated a work with this deed has dedicated the work to
-the public domain by waiving all of his or her rights to the work worldwide
-under copyright law, including all related and neighboring rights, to the
-extent allowed by law. You can copy, modify, distribute and perform the
-work, even for commercial purposes, all without asking permission. 
+The source of this project, FLAC Frontend, is made available under the
+Creative Commons CC0 1.0 Universal Public Domain Dedication. The binaries
+are distributed WITHOUT ANY WARRANTY, including fitness for any particular
+purpose, either explicit or implied.
 
 However, the flac.exe and metaflac.exe binaries this project relies on (and
-which are usually bundled) are licensed under GPL.
+which are usually bundled with it) are licensed under GPL. For more
+information see COPYING.GPL.txt
 
 ---------------------------------------------------------------------------
 ------                             FAQ                               ------
