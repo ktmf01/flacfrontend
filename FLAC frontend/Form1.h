@@ -573,6 +573,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
+			 batch->WriteLine("chcp 65001");
 			 batch->WriteLine("@ECHO OFF");
 
 			 // Check whether possible
@@ -655,6 +656,7 @@ private: System::Void btnFingerprint_Click(System::Object^  sender, System::Even
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
+			 batch->WriteLine("chcp 65001");
 			 
 
 			 for(i=0; i<numberOfFiles; i++){
@@ -679,6 +681,8 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 			 String ^ command = "flac.exe -t ";
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
+
+			 batch->WriteLine("chcp 65001");
 
 			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
 			 
@@ -705,6 +709,7 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			 int i;
 
 			 batch->WriteLine("@ECHO OFF");
+			 batch->WriteLine("chcp 65001");
 
 			 // Retrieve settings
 			  if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";

@@ -14,3 +14,6 @@ build/
 *.suo
 *.user
 
+# dependent executables #
+flac.exe
+metaflac.exe
