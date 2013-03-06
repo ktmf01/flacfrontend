@@ -530,22 +530,43 @@ namespace FLACfrontend {
 
 		}
 #pragma endregion
+
+// -------------------------------//
+// --- Right column of buttons --- //
+// -------------------------------//
+
 private: System::Void btnAdd_Click(System::Object^  sender, System::EventArgs^  e) {
 			 dlgAddFile->ShowDialog();
-			 }
+		 }
+
 private: System::Void dlgAddFile_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
 			 lstFiles->Items->AddRange(dlgAddFile->FileNames);
 		 }
+
 private: System::Void btnClear_Click(System::Object^  sender, System::EventArgs^  e) {
 			 lstFiles->Items->Clear();
 		 }
+
 private: System::Void btnRemove_Click(System::Object^  sender, System::EventArgs^  e) {
-			 lstFiles->Items->Remove(lstFiles->SelectedItem);
-			 
+			 lstFiles->Items->Remove(lstFiles->SelectedItem);	 
 		 }
+
+private: System::Void btnAdvanced_Click(System::Object^  sender, System::EventArgs^  e) {
+			 AdvDialog->ShowDialog();
+		 }
+
+private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^  e) {
+			 ttHelp->Show("Place your mouse pointer over a specific option to get more information",btnHelp);
+		 }
+
+// ----------------------------------//
+// --- Setting fields interaction --- //
+// ----------------------------------//
+
 private: System::Void tbLevel_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
 			 textLevel->Text = tbLevel->Value.ToString();
 		 }
+
 private: System::Void chkReplayGain_CheckStateChanged(System::Object^  sender, System::EventArgs^  e) {
 			 if(chkReplayGain->Checked == true){
 				 chkReplayGainAlbum->Checked = true;
@@ -556,15 +577,25 @@ private: System::Void chkReplayGain_CheckStateChanged(System::Object^  sender, S
 			 }
 
 		 }
+
+// ---------------------------------//
+// --- Output directory buttons --- //
+// ---------------------------------//
+
 private: System::Void btnSelectDirectory_Click(System::Object^  sender, System::EventArgs^  e) {
 			 dlgOutputDirectory->ShowDialog();
 			 if(!String::IsNullOrEmpty(dlgOutputDirectory->SelectedPath))
 				txtOutputDirectory->Text = dlgOutputDirectory->SelectedPath;
-
 		 }
+
 private: System::Void btnOutputDirSameAsInput_Click(System::Object^  sender, System::EventArgs^  e) {
 			 txtOutputDirectory->Text = "<< Same as input directory >>";
 		 }
+
+
+// ---------------------------//
+// --- Last row of buttons --- //
+// ---------------------------//
 
 private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
@@ -654,78 +685,6 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 Process::Start(batchFileName);
 		 }
 
-
-private: System::Void btnExit_Click(System::Object^  sender, System::EventArgs^  e) {
-			 this->Close();
-		 }
-private: System::Void btnAdvanced_Click(System::Object^  sender, System::EventArgs^  e) {
-			 AdvDialog->ShowDialog();
-		 }
-private: System::Void btnFingerprint_Click(System::Object^  sender, System::EventArgs^  e) {
-			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "metaflac.exe --show-md5sum ";
-			 int numberOfFiles = lstFiles->Items->Count;
-			 int i;
-
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
-			 
-			 // Proces files in batches of 50
-			 for(i=0; i<numberOfFiles; i++){
-				 if (i % 50 == 0){
-					batch->WriteLine(tmpBatch);
-					tmpBatch = command;
-				 }
-				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
-			 }
-			 batch->WriteLine(tmpBatch);
-			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
-
-			 // Execute batch-file
-			 Process::Start(batchFileName);
-		 }
-private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^  e) {
-			 ttHelp->Show("Place your mouse pointer over a specific option to get more information",btnHelp);
-		 }
-private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^  e) {
-			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "flac.exe -t ";
-			 int numberOfFiles = lstFiles->Items->Count;
-			 int i;
-
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
-
-			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
-			 
-			 // Process in batches of 50
-			 for(i=0; i<numberOfFiles; i++){
-				 if (i % 50 == 0){
-					batch->WriteLine(tmpBatch);
-					tmpBatch = command;
-				 }
-				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
-			 }
-			 batch->WriteLine(tmpBatch);
-			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
-
-			 // Execute batch-file
-			 Process::Start(batchFileName);
-		 }
 private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
 			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
@@ -777,6 +736,78 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			 // Execute batch-file
 			 Process::Start(batchFileName);
 		 }
+
+private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^  e) {
+			 // Let's first create some kind of BAT-file
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
+			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
+			 String ^ tmpBatch = "";
+			 String ^ command = "flac.exe -t ";
+			 int numberOfFiles = lstFiles->Items->Count;
+			 int i;
+
+			 // Supress commands and set codepage to unicode
+			 batch->WriteLine("@ECHO OFF");
+			 batch->WriteLine("chcp 65001");
+
+			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
+			 
+			 // Process in batches of 50
+			 for(i=0; i<numberOfFiles; i++){
+				 if (i % 50 == 0){
+					batch->WriteLine(tmpBatch);
+					tmpBatch = command;
+				 }
+				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+			 }
+			 batch->WriteLine(tmpBatch);
+			 // Add pause to let console window stay 
+			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
+			 batch->Close();
+
+			 // Execute batch-file
+			 Process::Start(batchFileName);
+		 }
+
+private: System::Void btnFingerprint_Click(System::Object^  sender, System::EventArgs^  e) {
+			 // Let's first create some kind of BAT-file
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
+			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
+			 String ^ tmpBatch = "";
+			 String ^ command = "metaflac.exe --show-md5sum ";
+			 int numberOfFiles = lstFiles->Items->Count;
+			 int i;
+
+			 // Supress commands and set codepage to unicode
+			 batch->WriteLine("@ECHO OFF");
+			 batch->WriteLine("chcp 65001");
+			 
+			 // Proces files in batches of 50
+			 for(i=0; i<numberOfFiles; i++){
+				 if (i % 50 == 0){
+					batch->WriteLine(tmpBatch);
+					tmpBatch = command;
+				 }
+				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+			 }
+			 batch->WriteLine(tmpBatch);
+			 // Add pause to let console window stay 
+			 batch->WriteLine("PAUSE");
+			 // Close file, otherwise it won't execute
+			 batch->Close();
+
+			 // Execute batch-file
+			 Process::Start(batchFileName);
+		 }
+
+private: System::Void btnExit_Click(System::Object^  sender, System::EventArgs^  e) {
+			 this->Close();
+		 }
+
+// ---------------------------//
+// --- Drag and drop stuff --- //
+// ---------------------------//
 
 private: System::Void lstFiles_DragEnter(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e) {
 			 // Show user that dragdrop is possible
