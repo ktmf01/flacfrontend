@@ -196,13 +196,12 @@ namespace FLACfrontend {
 private: System::Void btnCommandHelp_Click(System::Object^  sender, System::EventArgs^  e) {
 				 Process::Start("cmd","/c flac -H & PAUSE");
 			 }
-
-private: System::Void btnOK_Click(System::Object^  sender, System::EventArgs^  e) {
-			 this->Visible = false;
-		 }
 private: System::Void btnCueSheet_Click(System::Object^  sender, System::EventArgs^  e) {
 			 openCueSheet->ShowDialog();
 			 txtCuesheet->Text = openCueSheet->FileName;
+		 }
+private: System::Void btnOK_Click(System::Object^  sender, System::EventArgs^  e) {
+			 this->Visible = false;
 		 }
 };
 }

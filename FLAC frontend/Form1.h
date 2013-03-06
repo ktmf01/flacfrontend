@@ -215,7 +215,8 @@ namespace FLACfrontend {
 			// dlgAddFile
 			// 
 			this->dlgAddFile->FileName = L"dlgAddFile";
-			this->dlgAddFile->Filter = L"Supported Files|*.wav;*.flac;*.ogg|FLAC files|*.flac|WAV files|*.wav";
+			this->dlgAddFile->Filter = L"Supported Files|*.wav;*.flac;*.ogg;*.oga|FLAC files|*.flac|WAV files|*.wav|OGG Fi" 
+				L"les|*.ogg;*.oga";
 			this->dlgAddFile->Multiselect = true;
 			this->dlgAddFile->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &Form1::dlgAddFile_FileOk);
 			// 
@@ -569,7 +570,6 @@ private: System::Void tbLevel_ValueChanged(System::Object^  sender, System::Even
 
 private: System::Void chkReplayGain_CheckStateChanged(System::Object^  sender, System::EventArgs^  e) {
 			 if(chkReplayGain->Checked == true){
-				 chkReplayGainAlbum->Checked = true;
 				 chkReplayGainAlbum->Enabled = true;
 			 }else{
 				 chkReplayGainAlbum->Checked = false;
@@ -599,7 +599,7 @@ private: System::Void btnOutputDirSameAsInput_Click(System::Object^  sender, Sys
 
 private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "/flacfrontend.bat";
+			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
 			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
 			 String ^ tmpBatch = "";
 			 String ^ command = "flac.exe ";
@@ -619,14 +619,15 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 }
 
 			 // Retrieve settings and transform to command-line options
-			  if(chkVerify->Checked == true)		command += "-V ";
-			  if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
-			  if(chkKeepForeign->Checked == true)	command += "--keep-foreign-metadata ";
-			  if(chkOggFlac->Checked == true){	    command += "--ogg "; ext = ".oga"; }
-			  if(AdvDialog->chkIgnoreChunkSize->Checked == true)	    command += "--ignore-chunk-sizes ";
-			  if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false)
-				  command += "--replay-gain ";
-			  if(!String::IsNullOrEmpty(AdvDialog->txtCuesheet->Text))
+			 command += "-" + tbLevel->Value.ToString() + " ";
+			 if(chkVerify->Checked == true)		command += "-V ";
+			 if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
+			 if(chkKeepForeign->Checked == true)	command += "--keep-foreign-metadata ";
+			 if(chkOggFlac->Checked == true){	    command += "--ogg "; ext = ".oga"; }
+			 if(AdvDialog->chkIgnoreChunkSize->Checked == true)	    command += "--ignore-chunk-sizes ";
+			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false)
+				 command += "--replay-gain ";
+			 if(!String::IsNullOrEmpty(AdvDialog->txtCuesheet->Text))
 				  command += "--cuesheet " + AdvDialog->txtCuesheet->Text + " ";
 
 			  command += AdvDialog->txtCommandLine->Text + " ";
