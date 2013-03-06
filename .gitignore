@@ -1,0 +1,16 @@
+# OS Files #
+.directory
+*.DS_Store
+[Tt]humbs.db 
+
+
+# MSVC junk #
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+
