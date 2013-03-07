@@ -820,8 +820,6 @@ private: System::Void lstFiles_DragEnter(System::Object^  sender, System::Window
 private: System::Void lstFiles_DragDrop(System::Object^  sender, System::Windows::Forms::DragEventArgs^  e) {
 			 // Get filedrop into array of strings
 			 array<String^>^ FileDropList = (array<String^>^)e->Data->GetData(DataFormats::FileDrop);
-			 String^ FileDropItem = "";
-			 String^ FileDropDirItem = "";
 			 String^ extension = "";
 
 			 // First process each item that has been dropped
