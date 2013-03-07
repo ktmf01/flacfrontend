@@ -169,15 +169,12 @@ namespace FLACfrontend {
 			// 
 			// lstFiles
 			// 
-			this->lstFiles->AllowDrop = true;
 			this->lstFiles->FormattingEnabled = true;
 			this->lstFiles->HorizontalScrollbar = true;
 			this->lstFiles->Location = System::Drawing::Point(12, 12);
 			this->lstFiles->Name = L"lstFiles";
 			this->lstFiles->Size = System::Drawing::Size(393, 134);
 			this->lstFiles->TabIndex = 0;
-			this->lstFiles->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragDrop);
-			this->lstFiles->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragEnter);
 			// 
 			// btnAdd
 			// 
@@ -495,6 +492,7 @@ namespace FLACfrontend {
 			// 
 			// Form1
 			// 
+			this->AllowDrop = true;
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(493, 382);
@@ -518,6 +516,8 @@ namespace FLACfrontend {
 			this->MaximizeBox = false;
 			this->Name = L"Form1";
 			this->Text = L"FLAC Frontend";
+			this->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragDrop);
+			this->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragEnter);
 			this->gbEncoding->ResumeLayout(false);
 			this->gbEncoding->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->tbLevel))->EndInit();
