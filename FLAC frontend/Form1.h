@@ -610,7 +610,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 
 			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
+			 batch->WriteLine("chcp 65001 >nul");
 
 			 // Check whether possible
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == true && numberOfFiles > 50){
@@ -670,15 +670,23 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 				 batch->WriteLine("ECHO Now adding ReplayGain, this can take a while... ");
 				 tmpBatch = "metaflac --add-replay-gain ";
 				 for(i=0; i<numberOfFiles; i++){
-					 fileTemp = "" + lstFiles->Items[i];
-					 fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
-					 tmpBatch += "\"" + fileTemp + "\" ";
+					 if(txtOutputDirectory->Text != "<< Same as input directory >>"){
+						fileTemp = "" + lstFiles->Items[i];
+						fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
+						fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
+						tmpBatch += "\"" + fileTemp + "\" ";
+					 } else {
+						fileTemp = "" + lstFiles->Items[i];
+						fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
+						tmpBatch += "\"" + fileTemp + "\" ";
+					 }
 				 }
 				 batch->WriteLine(tmpBatch);
 			 }
 
 			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
+			 batch->WriteLine("ECHO Press any key to continue...");
+			 batch->WriteLine("PAUSE >nul");
 			 // Close file, otherwise it won't execute
 			 batch->Close();
 
@@ -698,7 +706,7 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 
 			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
+			 batch->WriteLine("chcp 65001 >nul");
 
 			 // Retrieve settings
 			  if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
@@ -730,7 +738,8 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			  }
 
 			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
+			 batch->WriteLine("ECHO Press any key to continue...");
+			 batch->WriteLine("PAUSE >nul");
 			 // Close file, otherwise it won't execute
 			 batch->Close();
 
@@ -749,7 +758,7 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 
 			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
+			 batch->WriteLine("chcp 65001 >nul");
 
 			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
 			 
@@ -763,7 +772,8 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 			 }
 			 batch->WriteLine(tmpBatch);
 			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
+			 batch->WriteLine("ECHO Press any key to continue...");
+			 batch->WriteLine("PAUSE >nul");
 			 // Close file, otherwise it won't execute
 			 batch->Close();
 
@@ -782,7 +792,7 @@ private: System::Void btnFingerprint_Click(System::Object^  sender, System::Even
 
 			 // Supress commands and set codepage to unicode
 			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001");
+			 batch->WriteLine("chcp 65001 >nul");
 			 
 			 // Proces files in batches of 50
 			 for(i=0; i<numberOfFiles; i++){
@@ -794,7 +804,8 @@ private: System::Void btnFingerprint_Click(System::Object^  sender, System::Even
 			 }
 			 batch->WriteLine(tmpBatch);
 			 // Add pause to let console window stay 
-			 batch->WriteLine("PAUSE");
+			 batch->WriteLine("ECHO Press any key to continue...");
+			 batch->WriteLine("PAUSE >nul");
 			 // Close file, otherwise it won't execute
 			 batch->Close();
 
@@ -821,12 +832,14 @@ private: System::Void lstFiles_DragDrop(System::Object^  sender, System::Windows
 			 // Get filedrop into array of strings
 			 array<String^>^ FileDropList = (array<String^>^)e->Data->GetData(DataFormats::FileDrop);
 			 String^ extension = "";
+			 String^ FileDropDirItem = "";
+			 String^ FileDropItem = "";
 
 			 // First process each item that has been dropped
 			 for each (String^ FileDropItem in FileDropList){
 				 if(Directory::Exists(FileDropItem)){
 					 // Check whether dropped item is directory and find all files in that directory
-					 for each (String^ FileDropDirItem in Directory::EnumerateFiles(FileDropItem,"*.*",SearchOption::AllDirectories)){			
+					 for each (String^ FileDropDirItem in Directory::GetFiles(FileDropItem,"*.*",SearchOption::AllDirectories)){			
 						extension = FileDropDirItem->Substring(FileDropDirItem->LastIndexOf(".")+1);
 						if((extension == "flac") || (extension == "oga") || (extension == "ogg") || (extension == "wav")){
 							// In directory search, only add relevant files

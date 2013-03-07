@@ -139,7 +139,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				EntryPointSymbol="main"
 				TargetMachine="1"
