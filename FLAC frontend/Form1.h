@@ -103,6 +103,7 @@ namespace FLACfrontend {
 
 	private: Advanced_options^ AdvDialog;
 	private: System::Windows::Forms::ToolTip^  ttHelp;
+	private: System::Windows::Forms::Button^  btnAbout;
 
 
 
@@ -160,6 +161,7 @@ namespace FLACfrontend {
 			this->btnHelp = (gcnew System::Windows::Forms::Button());
 			this->btnAdvanced = (gcnew System::Windows::Forms::Button());
 			this->ttHelp = (gcnew System::Windows::Forms::ToolTip(this->components));
+			this->btnAbout = (gcnew System::Windows::Forms::Button());
 			this->gbEncoding->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->tbLevel))->BeginInit();
 			this->gbOutputDir->SuspendLayout();
@@ -470,7 +472,7 @@ namespace FLACfrontend {
 			// 
 			// btnHelp
 			// 
-			this->btnHelp->Location = System::Drawing::Point(412, 256);
+			this->btnHelp->Location = System::Drawing::Point(412, 234);
 			this->btnHelp->Name = L"btnHelp";
 			this->btnHelp->Size = System::Drawing::Size(75, 23);
 			this->btnHelp->TabIndex = 13;
@@ -490,12 +492,24 @@ namespace FLACfrontend {
 			this->btnAdvanced->UseVisualStyleBackColor = true;
 			this->btnAdvanced->Click += gcnew System::EventHandler(this, &Form1::btnAdvanced_Click);
 			// 
+			// btnAbout
+			// 
+			this->btnAbout->Location = System::Drawing::Point(412, 263);
+			this->btnAbout->Name = L"btnAbout";
+			this->btnAbout->Size = System::Drawing::Size(75, 23);
+			this->btnAbout->TabIndex = 15;
+			this->btnAbout->Text = L"A&bout";
+			this->ttHelp->SetToolTip(this->btnAbout, L"Get version number of FLAC Frontend");
+			this->btnAbout->UseVisualStyleBackColor = true;
+			this->btnAbout->Click += gcnew System::EventHandler(this, &Form1::btnAbout_Click);
+			// 
 			// Form1
 			// 
 			this->AllowDrop = true;
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(493, 382);
+			this->Controls->Add(this->btnAbout);
 			this->Controls->Add(this->btnAdvanced);
 			this->Controls->Add(this->btnHelp);
 			this->Controls->Add(this->gbDecoding);
@@ -558,6 +572,10 @@ private: System::Void btnAdvanced_Click(System::Object^  sender, System::EventAr
 
 private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^  e) {
 			 ttHelp->Show("Place your mouse pointer over a specific option to get more information",btnHelp);
+		 }
+
+private: System::Void btnAbout_Click(System::Object^  sender, System::EventArgs^  e) {
+			 MessageBox::Show("FLAC Frontend v2.0, beta2.3, using FLAC 1.2.1","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
 		 }
 
 // ----------------------------------//

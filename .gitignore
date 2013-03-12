@@ -13,7 +13,5 @@ build/
 [Oo]bj/
 *.suo
 *.user
-
-# dependent executables #
-flac.exe
-metaflac.exe
+*.exe
+*.zip
