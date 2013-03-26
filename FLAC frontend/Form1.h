@@ -1,5 +1,8 @@
 #pragma once
 
+#include <windows.h>
+#undef GetTempPath
+
 #include "Advanced_options.h"
 
 
@@ -530,6 +533,7 @@ namespace FLACfrontend {
 			this->MaximizeBox = false;
 			this->Name = L"Form1";
 			this->Text = L"FLAC Frontend";
+			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->DragDrop += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragDrop);
 			this->DragEnter += gcnew System::Windows::Forms::DragEventHandler(this, &Form1::lstFiles_DragEnter);
 			this->gbEncoding->ResumeLayout(false);
@@ -575,7 +579,7 @@ private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^ 
 		 }
 
 private: System::Void btnAbout_Click(System::Object^  sender, System::EventArgs^  e) {
-			 MessageBox::Show("FLAC Frontend v2.0, beta2.3, using FLAC 1.2.1","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
+			 MessageBox::Show("FLAC Frontend v2.0, beta 3, using FLAC 1.3.0pre2 with UTF-8 patch","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
 		 }
 
 // ----------------------------------//
@@ -916,6 +920,16 @@ private: System::Void lstFiles_DragDrop(System::Object^  sender, System::Windows
 					// If not a directory, just add the dropped item
 					lstFiles->Items->Add(FileDropItem);
 				}
+			 }
+		 }
+private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
+			 if(!(File::Exists("flac.exe"))){
+				 MessageBox::Show("flac.exe is not found, FLAC frontend can't be used without it. Please reinstall FLAC frontend","FLAC not found",MessageBoxButtons::OK,MessageBoxIcon::Error);
+				 exit(1);
+			 }
+			 if(!(File::Exists("metaflac.exe"))){
+				 MessageBox::Show("metaflac.exe is not found, FLAC frontend can't be used without it. Please reinstall FLAC frontend","metaflac not found",MessageBoxButtons::OK,MessageBoxIcon::Error);
+				 exit(1);
 			 }
 		 }
 };

@@ -1,6 +1,9 @@
 #pragma once
 
+#include <windows.h>
+
 using namespace System;
+using namespace System::Diagnostics;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -192,8 +195,21 @@ namespace FLACfrontend {
 #pragma endregion
 
 private: System::Void btnCommandHelp_Click(System::Object^  sender, System::EventArgs^  e) {
-				 Process::Start("cmd","/c flac -H & PAUSE");
-			 }
+			 COORD c;
+
+			 FreeConsole();
+			 AllocConsole();
+			 c.X = 80; c.Y = 600;
+			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
+
+			 Process^ p = gcnew Process();
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c flac.exe -H & PAUSE";
+			 p->StartInfo->UseShellExecute = false;
+			 p->Start();
+			 p->WaitForExit();
+			 FreeConsole();
+		 }
 private: System::Void btnCueSheet_Click(System::Object^  sender, System::EventArgs^  e) {
 			 openCueSheet->ShowDialog();
 			 txtCuesheet->Text = openCueSheet->FileName;

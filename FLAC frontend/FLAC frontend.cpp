@@ -1,7 +1,5 @@
 // FLAC frontend.cpp : main project file.
 
-#include <windows.h>
-#undef GetTempPath
 #include "Form1.h"
 
 using namespace FLACfrontend;
