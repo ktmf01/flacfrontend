@@ -16,3 +16,5 @@ build/
 *.exe
 *.zip
 *.ncb
+*.msi
+*.wix???
