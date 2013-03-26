@@ -616,19 +616,14 @@ private: System::Void btnOutputDirSameAsInput_Click(System::Object^  sender, Sys
 // ---------------------------//
 
 private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs^  e) {
-			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "flac.exe ";
+			 String ^ fileargs = "";
+			 String ^ command  = "flac.exe";
+			 String ^ args = "";
 			 String ^ fileTemp = "";
 			 String ^ ext = ".flac";
+			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
-
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001 >nul");
 
 			 // Check whether possible
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == true && numberOfFiles > 50){
@@ -637,102 +632,128 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 }
 
 			 // Retrieve settings and transform to command-line options
-			 command += "-" + tbLevel->Value.ToString() + " ";
-			 if(chkVerify->Checked == true)		command += "-V ";
-			 if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
-			 if(chkKeepForeign->Checked == true)	command += "--keep-foreign-metadata ";
-			 if(chkOggFlac->Checked == true){	    command += "--ogg "; ext = ".oga"; }
-			 if(AdvDialog->chkIgnoreChunkSize->Checked == true)	    command += "--ignore-chunk-sizes ";
+			 args += "-" + tbLevel->Value.ToString() + " ";
+			 if(chkVerify->Checked == true)		    args += "-V ";
+			 if(chkDeleteInput->Checked == true)	args += "--delete-input-file ";
+			 if(chkKeepForeign->Checked == true)	args += "--keep-foreign-metadata ";
+			 if(chkOggFlac->Checked == true){	    args += "--ogg "; ext = ".oga"; }
+			 if(AdvDialog->chkIgnoreChunkSize->Checked == true)	    args += "--ignore-chunk-sizes ";
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false)
-				 command += "--replay-gain ";
+				 args += "--replay-gain ";
 			 if(!String::IsNullOrEmpty(AdvDialog->txtCuesheet->Text))
-				  command += "--cuesheet " + AdvDialog->txtCuesheet->Text + " ";
+				 args += "--cuesheet " + AdvDialog->txtCuesheet->Text + " ";
+			 args += AdvDialog->txtCommandLine->Text + " ";
 
-			  command += AdvDialog->txtCommandLine->Text + " ";
-
+			 // Get console ready and populate proces
+			 FreeConsole();
+			 AllocConsole();
+			 c.X = 120; c.Y = 8000;
+			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
+			 Process^ p = gcnew Process();
+			 p->StartInfo->FileName = command;
+			 p->StartInfo->UseShellExecute = false;
 			  
-			  if(txtOutputDirectory->Text != "<< Same as input directory >>"){
+			 if(txtOutputDirectory->Text != "<< Same as input directory >>"){
 				  // Proces each file seperate if output directory is specified
 				  for(i=0; i<numberOfFiles; i++){
 					  fileTemp = "" + lstFiles->Items[i];
 					  fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
 					  fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
-					  batch->WriteLine(command + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"");
+					  p->StartInfo->Arguments = args + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"";
+					  p->Start();
+					  p->WaitForExit();
 				  }
 			  } else if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false){
 				  // Proces files in batches of 50 if output directory is same as input
 				  // and (not-album) ReplayGain processing is required
 				  for(i=0; i<numberOfFiles; i++){
-					  if (i % 50 == 0){
-						  batch->WriteLine(tmpBatch);
-						  tmpBatch = command;
+					  if (i % 50 == 49){
+						  p->StartInfo->Arguments = args + fileargs;
+						  p->Start();
+						  p->WaitForExit();
+						  fileargs = "";
 					  }
-					  tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+					  fileargs += "\"" + lstFiles->Items[i] + "\" ";
 				  }
-				  batch->WriteLine(tmpBatch);
+				  // Run remainder
+				  p->StartInfo->Arguments = args + fileargs;
+				  p->Start();
+				  p->WaitForExit();	
 			  } else {
 				  // Proces files in batches of 50 if output directory is same as input
 				  // and ReplayGain processing is not required or Album gain has to be calculated seperately
 				  for(i=0; i<numberOfFiles; i++){
-					  if (i % 50 == 0){
-						  batch->WriteLine(tmpBatch);
-						  tmpBatch = command;
+					  if (i % 50 == 49){
+						  p->StartInfo->Arguments = args + fileargs;
+						  p->Start();
+						  p->WaitForExit();
+						  fileargs = "";
 					  }
-					  tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+					  fileargs += "\"" + lstFiles->Items[i] + "\" ";
 				  }
-				  batch->WriteLine(tmpBatch);
+				  // Run remainder
+				  p->StartInfo->Arguments = args + fileargs;
+				  p->Start();
+				  p->WaitForExit();	
 			  }
 
 			 // Add ReplayGain tags if album-tags have to be added 
 		     if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == true){
-				 batch->WriteLine("ECHO Now adding ReplayGain, this can take a while... ");
-				 tmpBatch = "metaflac --add-replay-gain ";
+				 fileargs = "";
+				 Console::WriteLine("");
+				 Console::WriteLine("Now adding ReplayGain, this can take a while... ");
+				 p->StartInfo->FileName = "metaflac.exe";
+				 args = "--add-replay-gain ";
 				 for(i=0; i<numberOfFiles; i++){
 					 if(txtOutputDirectory->Text != "<< Same as input directory >>"){
 						fileTemp = "" + lstFiles->Items[i];
 						fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
 						fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
-						tmpBatch += "\"" + fileTemp + "\" ";
+						fileargs += "\"" + fileTemp + "\" ";
 					 } else {
 						fileTemp = "" + lstFiles->Items[i];
 						fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ext;
-						tmpBatch += "\"" + fileTemp + "\" ";
+						fileargs += "\"" + fileTemp + "\" ";
 					 }
 				 }
-				 batch->WriteLine(tmpBatch);
+				 p->StartInfo->Arguments = args + fileargs;
+				 p->Start();
+				 p->WaitForExit();
 			 }
 
 			 // Add pause to let console window stay 
-			 batch->WriteLine("ECHO Press any key to continue...");
-			 batch->WriteLine("PAUSE >nul");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
-
-			 // Execute batch-file
-			 Process::Start(batchFileName);
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c PAUSE";
+			 p->Start();
+			 p->WaitForExit();
+			 FreeConsole();
 		 }
 
 private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs^  e) {
-			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "flac.exe -d ";
+			 String ^ fileargs = "";
+			 String ^ command  = "flac.exe";
+			 String ^ args = "-d ";
 			 String ^ fileTemp = "";
+			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001 >nul");
-
 			 // Retrieve settings
-			  if(chkDeleteInput->Checked == true)	command += "--delete-input-file ";
-			  if(chkKeepForeign->Checked == true)	command += "--keep-foreign-metadata ";
-			  if(chkOggFlac->Checked == true)	    command += "--ogg ";
-			  if(chkDecodeThroughErrors->Checked == true)	    command += "-F ";
+			  if(chkDeleteInput->Checked == true)	args += "--delete-input-file ";
+			  if(chkKeepForeign->Checked == true)	args += "--keep-foreign-metadata ";
+			  if(chkOggFlac->Checked == true)	    args += "--ogg ";
+			  if(chkDecodeThroughErrors->Checked == true)	    args += "-F ";
 
-			  command += AdvDialog->txtCommandLine->Text + " ";
+			  args += AdvDialog->txtCommandLine->Text + " ";
+
+			 // Get console ready and populate proces
+			 FreeConsole();
+			 AllocConsole();
+			 c.X = 120; c.Y = 8000;
+			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
+			 Process^ p = gcnew Process();
+			 p->StartInfo->FileName = command;
+			 p->StartInfo->UseShellExecute = false;
 
 
 			  if(txtOutputDirectory->Text != "<< Same as input directory >>"){
@@ -741,94 +762,121 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 						  fileTemp = "" + lstFiles->Items[i];
 						  fileTemp = txtOutputDirectory->Text + "\\" + fileTemp->Substring(fileTemp->LastIndexOf("\\"));
 						  fileTemp = fileTemp->Substring(0,fileTemp->LastIndexOf(".")) + ".wav";
-						  batch->WriteLine(command + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"");
+						  p->StartInfo->Arguments = args + "-o " + "\"" + fileTemp + "\" \"" + lstFiles->Items[i] + "\"";
+						  p->Start();
+						  p->WaitForExit();
 					  }
 			  } else {
 				  // Proces in batches of 50 if file is processed in same directory
 				  for(i=0; i<numberOfFiles; i++){
-					  if (i % 50 == 0){
-						  batch->WriteLine(tmpBatch);
-						  tmpBatch = command;
+					  if (i % 50 == 49){
+						  p->StartInfo->Arguments = args + fileargs;
+						  p->Start();
+						  p->WaitForExit();
+						  fileargs = "";
 					  }
-					  tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+					  fileargs += "\"" + lstFiles->Items[i] + "\" ";
 				  }
-				  batch->WriteLine(tmpBatch);
+				  // Run remainder
+				  p->StartInfo->Arguments = args + fileargs;
+				  p->Start();
+				  p->WaitForExit();				  
 			  }
 
 			 // Add pause to let console window stay 
-			 batch->WriteLine("ECHO Press any key to continue...");
-			 batch->WriteLine("PAUSE >nul");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
-
-			 // Execute batch-file
-			 Process::Start(batchFileName);
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c PAUSE";
+			 p->Start();
+			 p->WaitForExit();
+			 FreeConsole();
 		 }
 
 private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "flac.exe -t ";
+			 String ^ fileargs = "";
+			 String ^ command  = "flac.exe";
+			 String ^ args = "-t ";
+			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001 >nul");
-
-			 if(chkDecodeThroughErrors->Checked == true)	command += "-F ";
+			 if(chkDecodeThroughErrors->Checked == true)	args += "-F ";
 			 
+			 // Get console ready and populate proces
+			 FreeConsole();
+			 AllocConsole();
+			 c.X = 120; c.Y = 8000;
+			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
+			 Process^ p = gcnew Process();
+			 p->StartInfo->FileName = command;
+			 p->StartInfo->UseShellExecute = false;
+
+
 			 // Process in batches of 50
 			 for(i=0; i<numberOfFiles; i++){
-				 if (i % 50 == 0){
-					batch->WriteLine(tmpBatch);
-					tmpBatch = command;
+				 if (i % 50 == 49){
+				    p->StartInfo->Arguments = args + fileargs;
+					p->Start();
+					p->WaitForExit();
+					fileargs = "";
 				 }
-				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+				 fileargs += "\"" + lstFiles->Items[i] + "\" ";
 			 }
-			 batch->WriteLine(tmpBatch);
-			 // Add pause to let console window stay 
-			 batch->WriteLine("ECHO Press any key to continue...");
-			 batch->WriteLine("PAUSE >nul");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
+			 
+			 // Run remainder
+		     p->StartInfo->Arguments = args + fileargs;
+			 p->Start();
+			 p->WaitForExit();
 
-			 // Execute batch-file
-			 Process::Start(batchFileName);
+			 // Add pause to let console window stay 
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c PAUSE";
+			 p->Start();
+			 p->WaitForExit();
+			 FreeConsole();
+			 
 		 }
 
 private: System::Void btnFingerprint_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
-			 String ^ batchFileName = Path::GetTempPath() + "flacfrontend.bat";
-			 StreamWriter ^ batch = gcnew StreamWriter(batchFileName);
-			 String ^ tmpBatch = "";
-			 String ^ command = "metaflac.exe --show-md5sum ";
+			 String ^ fileargs = "";
+			 String ^ command = "metaflac.exe";
+			 String ^ args = "--show-md5sum ";
+			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
 			 int i;
 
-			 // Supress commands and set codepage to unicode
-			 batch->WriteLine("@ECHO OFF");
-			 batch->WriteLine("chcp 65001 >nul");
+			 // Get console ready and populate proces
+			 FreeConsole();
+			 AllocConsole();
+			 c.X = 120; c.Y = 8000;
+			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
+			 Process^ p = gcnew Process();
+			 p->StartInfo->FileName = command;
+			 p->StartInfo->UseShellExecute = false;
 			 
 			 // Proces files in batches of 50
 			 for(i=0; i<numberOfFiles; i++){
-				 if (i % 50 == 0){
-					batch->WriteLine(tmpBatch);
-					tmpBatch = command;
+				 if (i % 50 == 49){
+				    p->StartInfo->Arguments = args + fileargs;
+					p->Start();
+					p->WaitForExit();
+					fileargs = "";
 				 }
-				 tmpBatch += "\"" + lstFiles->Items[i] + "\" ";
+				 fileargs += "\"" + lstFiles->Items[i] + "\" ";
 			 }
-			 batch->WriteLine(tmpBatch);
-			 // Add pause to let console window stay 
-			 batch->WriteLine("ECHO Press any key to continue...");
-			 batch->WriteLine("PAUSE >nul");
-			 // Close file, otherwise it won't execute
-			 batch->Close();
 
-			 // Execute batch-file
-			 Process::Start(batchFileName);
+			 // Run remainder
+		     p->StartInfo->Arguments = args + fileargs;
+			 p->Start();
+			 p->WaitForExit();
+
+			 // Add pause to let console window stay 
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c PAUSE";
+			 p->Start();
+			 p->WaitForExit();
+			 FreeConsole();
 		 }
 
 private: System::Void btnExit_Click(System::Object^  sender, System::EventArgs^  e) {
