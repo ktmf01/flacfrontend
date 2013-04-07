@@ -11,7 +11,7 @@
     <Property Id='DiskPrompt' Value="Something went wrong here..." />
     
     <PropertyRef Id="NETFRAMEWORK20"/>
-    <Condition Message='This setup requires the .NET Framework 2.0. Please install it and try again'>
+    <Condition Message='This setup requires the .NET Framework 2.0, 3.0 or 3.5. Please install one of those (not 4.0 or newer) and try again'>
       <![CDATA[Installed OR (NETFRAMEWORK20)]]>
     </Condition>
     
