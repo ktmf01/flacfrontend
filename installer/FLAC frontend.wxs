@@ -11,10 +11,9 @@
     <Property Id='DiskPrompt' Value="Something went wrong here..." />
     
     <PropertyRef Id="NETFRAMEWORK20"/>
-    <PropertyRef Id="NETFRAMEWORK40FULL"/>
-    <PropertyRef Id="NETFRAMEWORK45"/>
+    <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <Condition Message='This setup requires at least .NET Framework 2.0. Please install it and try again'>
-      <![CDATA[NETFRAMEWORK20 OR NETFRAMEWORK40FULL OR NETFRAMEWORK45]]>
+      <![CDATA[NETFRAMEWORK20 OR NETFRAMEWORK40CLIENT]]>
     </Condition>
     
     <Directory Id='TARGETDIR' Name='SourceDir'>
@@ -24,13 +23,13 @@
 	    <File Id='FLACFrontendEXE4' Name='FLAC frontend-NET40.exe' DiskId='1' Source='../release/FLAC frontend-VS2012.exe' KeyPath='yes'>
 	      <Shortcut Id="startmenuFLACFrontend4" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
 	    </File>
-	    <Condition>NETFRAMEWORK45 OR NETFRAMEWORK40FULL</Condition>
+	    <Condition>NETFRAMEWORK40CLIENT</Condition>
 	  </Component>
 	  <Component Id='FLACFrontend2' Guid='A9BF898D-5772-45B6-B773-5FC46EEE9C10'>
 	    <File Id='FLACFrontendEXE2' Name='FLAC frontend-NET20.exe' DiskId='1' Source='../release/FLAC frontend-VS2005.exe' KeyPath='yes'>
 	      <Shortcut Id="startmenuFLACFrontend2" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
 	    </File>
-	    <Condition>NETFRAMEWORK20 AND NOT (NETFRAMEWORK45 OR NETFRAMEWORK40FULL)</Condition>
+	    <Condition>NETFRAMEWORK20 AND NOT NETFRAMEWORK40CLIENT</Condition>
 	  </Component>
 	  <Component Id="FLAC" Guid='0DB44C1A-793A-4ECC-B2F4-1C594E1D5F15'>
 	    <File Id='FLACEXE' Name='flac.exe' DiskId='1' Source='../release/flac.exe' KeyPath='yes' />
