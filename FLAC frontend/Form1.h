@@ -240,6 +240,7 @@ namespace FLACfrontend {
 			// chkReplayGainAlbum
 			// 
 			this->chkReplayGainAlbum->AutoSize = true;
+			this->chkReplayGainAlbum->Enabled = false;
 			this->chkReplayGainAlbum->Location = System::Drawing::Point(30, 108);
 			this->chkReplayGainAlbum->Name = L"chkReplayGainAlbum";
 			this->chkReplayGainAlbum->Size = System::Drawing::Size(164, 17);
@@ -632,6 +633,10 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 // Check whether possible
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == true && numberOfFiles > 50){
 				 MessageBox::Show("Adding Album ReplayGain for more then 50 files is not possible","Too many files",MessageBoxButtons::OK,MessageBoxIcon::Error);
+				 return;
+			 }
+			 if(chkReplayGain->Checked == true && chkOggFlac->Checked == true){
+				 MessageBox::Show("Adding ReplayGain to OGG-FLAC files is currently not supported","No ReplayGain with Ogg",MessageBoxButtons::OK,MessageBoxIcon::Error);
 				 return;
 			 }
 
