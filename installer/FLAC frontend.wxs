@@ -11,17 +11,26 @@
     <Property Id='DiskPrompt' Value="Something went wrong here..." />
     
     <PropertyRef Id="NETFRAMEWORK20"/>
-    <Condition Message='This setup requires the .NET Framework 2.0, 3.0 or 3.5. Please install one of those (not 4.0 or newer) and try again'>
-      <![CDATA[Installed OR (NETFRAMEWORK20)]]>
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <Condition Message='This setup requires at least .NET Framework 2.0. Please install it and try again'>
+      <![CDATA[NETFRAMEWORK20 OR NETFRAMEWORK40FULL OR NETFRAMEWORK45]]>
     </Condition>
     
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
 	<Directory Id='INSTALLDIR' Name='FLAC Frontend'>
-	  <Component Id='FLACFrontend' Guid='A9BF898D-5772-45B6-B773-5FC46EEE9C10'>
-	    <File Id='FLACFrontendEXE' Name='FLAC frontend.exe' DiskId='1' Source='../release/FLAC frontend.exe' KeyPath='yes'>
-	      <Shortcut Id="startmenuFLACFrontend" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
+	  <Component Id='FLACFrontend4' Guid='3C57A62F-CE12-4B85-AC96-ED7660258010'>
+	    <File Id='FLACFrontendEXE4' Name='FLAC frontend-NET40.exe' DiskId='1' Source='../release/FLAC frontend-VS2012.exe' KeyPath='yes'>
+	      <Shortcut Id="startmenuFLACFrontend4" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
 	    </File>
+	    <Condition>NETFRAMEWORK45 OR NETFRAMEWORK40FULL</Condition>
+	  </Component>
+	  <Component Id='FLACFrontend2' Guid='A9BF898D-5772-45B6-B773-5FC46EEE9C10'>
+	    <File Id='FLACFrontendEXE2' Name='FLAC frontend-NET20.exe' DiskId='1' Source='../release/FLAC frontend-VS2005.exe' KeyPath='yes'>
+	      <Shortcut Id="startmenuFLACFrontend2" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
+	    </File>
+	    <Condition>NETFRAMEWORK20 AND NOT (NETFRAMEWORK45 OR NETFRAMEWORK40FULL)</Condition>
 	  </Component>
 	  <Component Id="FLAC" Guid='0DB44C1A-793A-4ECC-B2F4-1C594E1D5F15'>
 	    <File Id='FLACEXE' Name='flac.exe' DiskId='1' Source='../release/flac.exe' KeyPath='yes' />
@@ -50,7 +59,8 @@
     </Directory>
     
     <Feature Id='Complete' Level='1'>
-      <ComponentRef Id='FLACFrontend' />
+      <ComponentRef Id='FLACFrontend2' />
+      <ComponentRef Id='FLACFrontend4' />
       <ComponentRef Id='FLAC' />
       <ComponentRef Id='metaflac' />
       <ComponentRef Id='ProgramMenuDir' />

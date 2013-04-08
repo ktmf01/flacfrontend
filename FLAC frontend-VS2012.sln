@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FLAC frontend", "FLAC frontend\FLAC frontend.vcxproj", "{381D4978-2D25-47B5-844E-B6F6A87A09FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{381D4978-2D25-47B5-844E-B6F6A87A09FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{381D4978-2D25-47B5-844E-B6F6A87A09FC}.Debug|Win32.Build.0 = Debug|Win32
+		{381D4978-2D25-47B5-844E-B6F6A87A09FC}.Release|Win32.ActiveCfg = Release|Win32
+		{381D4978-2D25-47B5-844E-B6F6A87A09FC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
