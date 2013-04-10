@@ -217,8 +217,8 @@ namespace FLACfrontend {
 			// dlgAddFile
 			// 
 			this->dlgAddFile->FileName = L"dlgAddFile";
-			this->dlgAddFile->Filter = L"Supported Files|*.wav;*.flac;*.ogg;*.oga|FLAC files|*.flac|WAV files|*.wav|OGG Fi" 
-				L"les|*.ogg;*.oga";
+			this->dlgAddFile->Filter = L"Supported Files|*.wav;*.flac;*.ogg;*.oga;*.aiff;*.w64;*.raw|FLAC files|*.flac|Unc" 
+				L"ompressed files|*.wav;*.w64;*.aiff;*.raw|OGG Files|*.ogg;*.oga";
 			this->dlgAddFile->Multiselect = true;
 			this->dlgAddFile->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &Form1::dlgAddFile_FileOk);
 			// 
