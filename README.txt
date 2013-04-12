@@ -17,7 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 The source of this project and the FLAC project can be found on 
-http://sourceforge.net/project/flacfrontend and http://flac.sourceforge.net
+http://sourceforge.net/project/flacfrontend and http://xiph.org/flac
 respectively.
 
 ---------------------------------------------------------------------------
@@ -35,19 +35,10 @@ Yes, there is. Just drag any files or directories to the list box in the
 top left of the FLAC frontend window. Any directories will automatically be
 searched (recursively) for .flac, .ogg, .oga and .wav files.
 
-3) I encoded/decoded/tested/fingerprinted a lot of files, left it running
-for a while, and now I can't see the results for the topmost ones any more!
-The Windows command line works with a buffer that has usually a max of 300
-lines. If you want to increase this, right click the icon in the top left
-corner of the command line window and choose properties. Search for an
-option called console buffer size (or something like that) and increase the
-max number of lines.
-
-4) FLAC frontend doesn't accept file names that contain foreign characters!
-That's a problem with the FLAC encoder that is being worked on. Sorry
-
-
-
+3) Where is FLAC tester?
+FLAC tester has been replaced by the frontend, because the frontend now has
+drag-and-drop support too. Just drag the files you want to test to the FLAC
+Frontend and click the test button.
 
 
 
