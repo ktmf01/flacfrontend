@@ -203,11 +203,18 @@ private: System::Void btnCommandHelp_Click(System::Object^  sender, System::Even
 			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
 
 			 Process^ p = gcnew Process();
-			 p->StartInfo->FileName = "cmd";
-			 p->StartInfo->Arguments = "/c flac.exe -H & PAUSE";
+			 p->StartInfo->FileName = "tools/flac.exe";
 			 p->StartInfo->UseShellExecute = false;
+			 p->StartInfo->Arguments = "-H";
 			 p->Start();
 			 p->WaitForExit();
+
+			 // Add pause to let console window stay 
+			 p->StartInfo->FileName = "cmd";
+			 p->StartInfo->Arguments = "/c PAUSE";
+			 p->Start();
+			 p->WaitForExit();
+
 			 FreeConsole();
 		 }
 private: System::Void btnCueSheet_Click(System::Object^  sender, System::EventArgs^  e) {

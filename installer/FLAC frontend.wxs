@@ -31,12 +31,6 @@
 	    </File>
 	    <Condition>NETFRAMEWORK20 AND NOT NETFRAMEWORK40CLIENT</Condition>
 	  </Component>
-	  <Component Id="FLAC" Guid='0DB44C1A-793A-4ECC-B2F4-1C594E1D5F15'>
-	    <File Id='FLACEXE' Name='flac.exe' DiskId='1' Source='../release/flac.exe' KeyPath='yes' />
-	  </Component>
-	  <Component Id="metaflac" Guid='F92C6203-1C05-425A-8189-A478776AC929'>
-	    <File Id='metaflacEXE' Name='metaflac.exe' DiskId='1' Source='../release/metaflac.exe' KeyPath='yes' />
-	  </Component>
 	  <Component Id="readme" Guid='FE905A95-84CA-45FE-841A-F275E9507308'>
 	    <File Id='readmeTXT' Name='README.txt' DiskId='1' Source='../README.txt' KeyPath='yes'>
      	      <Shortcut Id="startmenuREADME" Directory="ProgramMenuDir" Name="README" Advertise="yes" />
@@ -45,6 +39,14 @@
 	  <Component Id="GPL" Guid='B3B8D246-38CB-4F79-8182-739F69B7BB50'>
 	    <File Id='GPLTXT' Name='COPYING.GPL.txt' DiskId='1' Source='../COPYING.GPL.txt' KeyPath='yes' />
 	  </Component>
+	  <Directory Id='ToolsFolder' Name='tools'>
+	    <Component Id="FLAC" Guid='0DB44C1A-793A-4ECC-B2F4-1C594E1D5F15'>
+	      <File Id='FLACEXE' Name='flac.exe' DiskId='1' Source='../release/flac.exe' KeyPath='yes' />
+	    </Component>
+	    <Component Id="metaflac" Guid='F92C6203-1C05-425A-8189-A478776AC929'>
+	      <File Id='metaflacEXE' Name='metaflac.exe' DiskId='1' Source='../release/metaflac.exe' KeyPath='yes' />
+	    </Component>
+	  </Directory>
 	</Directory>
       </Directory>
 	<Directory Id="ProgramMenuFolder" Name="Programs">

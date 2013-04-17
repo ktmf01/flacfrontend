@@ -580,7 +580,7 @@ private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^ 
 		 }
 
 private: System::Void btnAbout_Click(System::Object^  sender, System::EventArgs^  e) {
-			 MessageBox::Show("FLAC Frontend v2.0, beta 4, using FLAC 1.3.0pre3 compiled by Case","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
+			 MessageBox::Show("FLAC Frontend v2.0, beta 5, using FLAC 1.3.0pre3 compiled by Case","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
 		 }
 
 // ----------------------------------//
@@ -622,7 +622,7 @@ private: System::Void btnOutputDirSameAsInput_Click(System::Object^  sender, Sys
 
 private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 String ^ fileargs = "";
-			 String ^ command  = "flac.exe";
+			 String ^ command  = "tools/flac.exe";
 			 String ^ args = "";
 			 String ^ fileTemp = "";
 			 String ^ ext = ".flac";
@@ -656,7 +656,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 // Get console ready and populate proces
 			 FreeConsole();
 			 AllocConsole();
-			 c.X = 120; c.Y = 8000;
+			 c.X = 80; c.Y= 8000;
 			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
 			 Process^ p = gcnew Process();
 			 p->StartInfo->FileName = command;
@@ -740,7 +740,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 
 private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs^  e) {
 			 String ^ fileargs = "";
-			 String ^ command  = "flac.exe";
+			 String ^ command  = "tools/flac.exe";
 			 String ^ args = "-d ";
 			 String ^ fileTemp = "";
 			 COORD c;
@@ -758,7 +758,7 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 			 // Get console ready and populate proces
 			 FreeConsole();
 			 AllocConsole();
-			 c.X = 120; c.Y = 8000;
+			 c.X = 80; c.Y = 8000;
 			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
 			 Process^ p = gcnew Process();
 			 p->StartInfo->FileName = command;
@@ -803,7 +803,7 @@ private: System::Void btnDecode_Click(System::Object^  sender, System::EventArgs
 private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
 			 String ^ fileargs = "";
-			 String ^ command  = "flac.exe";
+			 String ^ command  = "tools/flac.exe";
 			 String ^ args = "-t ";
 			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
@@ -814,7 +814,7 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 			 // Get console ready and populate proces
 			 FreeConsole();
 			 AllocConsole();
-			 c.X = 120; c.Y = 8000;
+			 c.X = 80; c.Y = 8000;
 			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
 			 Process^ p = gcnew Process();
 			 p->StartInfo->FileName = command;
@@ -849,7 +849,7 @@ private: System::Void btnTest_Click(System::Object^  sender, System::EventArgs^ 
 private: System::Void btnFingerprint_Click(System::Object^  sender, System::EventArgs^  e) {
 			 // Let's first create some kind of BAT-file
 			 String ^ fileargs = "";
-			 String ^ command = "metaflac.exe";
+			 String ^ command = "tools/metaflac.exe";
 			 String ^ args = "--show-md5sum ";
 			 COORD c;
 			 int numberOfFiles = lstFiles->Items->Count;
@@ -858,7 +858,7 @@ private: System::Void btnFingerprint_Click(System::Object^  sender, System::Even
 			 // Get console ready and populate proces
 			 FreeConsole();
 			 AllocConsole();
-			 c.X = 120; c.Y = 8000;
+			 c.X = 80; c.Y = 8000;
 			 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),c);
 			 Process^ p = gcnew Process();
 			 p->StartInfo->FileName = command;
@@ -928,11 +928,11 @@ private: System::Void lstFiles_DragDrop(System::Object^  sender, System::Windows
 			 }
 		 }
 private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
-			 if(!(File::Exists("flac.exe"))){
+			 if(!(File::Exists("tools/flac.exe"))){
 				 MessageBox::Show("flac.exe is not found, FLAC frontend can't be used without it. Please reinstall FLAC frontend","FLAC not found",MessageBoxButtons::OK,MessageBoxIcon::Error);
 				 exit(1);
 			 }
-			 if(!(File::Exists("metaflac.exe"))){
+			 if(!(File::Exists("tools/metaflac.exe"))){
 				 MessageBox::Show("metaflac.exe is not found, FLAC frontend can't be used without it. Please reinstall FLAC frontend","metaflac not found",MessageBoxButtons::OK,MessageBoxIcon::Error);
 				 exit(1);
 			 }
