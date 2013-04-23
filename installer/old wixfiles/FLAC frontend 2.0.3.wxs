@@ -1,31 +1,24 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='FLAC Frontend' Id='FB1F32DD-F26D-42DE-8011-A6B3BE6BA252' UpgradeCode='BE441FF1-7C48-4A53-80FC-E7A8DB9E1821'
-    Language='1033' Codepage='1252' Version='2.0.4' Manufacturer='Xiph.org'>
+  <Product Name='FLAC Frontend' Id='C2DEDC34-E006-4431-873D-D25CF7676F38' UpgradeCode='BE441FF1-7C48-4A53-80FC-E7A8DB9E1821'
+    Language='1033' Codepage='1252' Version='2.0.3' Manufacturer='Xiph.org'>
 
-    <Package Id='*' Keywords='Installer' Description="FLAC Frontend Installer" InstallScope="perMachine"
+    <Package Id='*' Keywords='Installer' Description="FLAC Frontend Installer"
       Manufacturer='Xiph.org' InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
       
     <Media Id='1' Cabinet='youShouldntSeeThis.cab' EmbedCab='yes' DiskPrompt='Something went wrong here...' />
-    <Property Id='DiskPrompt' Value="Something went wrong here..." />    
-
+    <Property Id='DiskPrompt' Value="Something went wrong here..." />
+    
     <PropertyRef Id="NETFRAMEWORK20"/>
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <Condition Message='This setup requires at least .NET Framework 2.0. Please install it and try again'>
       <![CDATA[NETFRAMEWORK20 OR NETFRAMEWORK40CLIENT]]>
     </Condition>
-
-    <Property Id="OLDFLAC">
-      <RegistrySearch Id="FindFLACDir" Root="HKLM" Key="SOFTWARE\FLAC" Type="directory" >
-	   <FileSearch Name="uninstall.exe" />
-      </RegistrySearch>
-    </Property>
-    <Condition Message="The installer has detected an old version of FLAC Frontend is installed. To avoid confusion, please remove the old version manually before proceeding">NOT OLDFLAC</Condition>
     
     <Directory Id='TARGETDIR' Name='SourceDir'>
-     <Directory Id='ProgramFilesFolder' Name='PFiles'>
-	 <Directory Id='INSTALLDIR' Name='FLAC Frontend'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+	<Directory Id='INSTALLDIR' Name='FLAC Frontend'>
 	  <Component Id='FLACFrontend4' Guid='3C57A62F-CE12-4B85-AC96-ED7660258010'>
 	    <File Id='FLACFrontendEXE4' Name='FLAC frontend-NET40.exe' DiskId='1' Source='../release/FLAC frontend-VS2012.exe' KeyPath='yes'>
 	      <Shortcut Id="startmenuFLACFrontend4" Directory="ProgramMenuDir" Name="FLAC Frontend" Icon="flac.ico" WorkingDirectory="INSTALLDIR" Advertise="yes" />
@@ -60,7 +53,7 @@
         <Directory Id="ProgramMenuDir" Name="FLAC Frontend">
           <Component Id="ProgramMenuDir" Guid="4BAFFBE4-B323-4B5F-BFCB-E2CCA46CCFA0">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
-            <RegistryValue Root='HKMU' Key='Software\FLAC Frontend' Type='string' Value='' KeyPath='yes' />
+            <RegistryValue Root='HKCU' Key='Software\FLAC Frontend' Type='string' Value='' KeyPath='yes' />
           </Component>
         </Directory>
       </Directory>
@@ -77,7 +70,6 @@
     </Feature>
 
     <Icon Id="flac.ico" SourceFile="../FLAC frontend/app.ico" />
-    <Property Id="ARPPRODUCTICON" Value="flac.ico" />
     
     <UIRef Id="WixUI_Minimal" />
     <WixVariable Id="WixUILicenseRtf" Value="COPYING.GPL.rtf" />
