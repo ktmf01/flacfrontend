@@ -711,7 +711,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 				 fileargs = "";
 				 Console::WriteLine("");
 				 Console::WriteLine("Now adding ReplayGain, this can take a while... ");
-				 p->StartInfo->FileName = "metaflac.exe";
+				 p->StartInfo->FileName = "tools/metaflac.exe";
 				 args = "--add-replay-gain ";
 				 for(i=0; i<numberOfFiles; i++){
 					 if(txtOutputDirectory->Text != "<< Same as input directory >>"){
