@@ -78,6 +78,7 @@ namespace FLACfrontend {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(Advanced_options::typeid));
 			this->btnCommandHelp = (gcnew System::Windows::Forms::Button());
 			this->grpbExtraOptions = (gcnew System::Windows::Forms::GroupBox());
 			this->txtCommandLine = (gcnew System::Windows::Forms::TextBox());
@@ -182,6 +183,7 @@ namespace FLACfrontend {
 			this->Controls->Add(this->btnOK);
 			this->Controls->Add(this->grpbExtraOptions);
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"Advanced_options";
 			this->Text = L"Advanced options";
 			this->grpbExtraOptions->ResumeLayout(false);
