@@ -40,6 +40,14 @@ FLAC tester has been replaced by the frontend, because the frontend now has
 drag-and-drop support too. Just drag the files you want to test to the FLAC
 Frontend and click the test button.
 
+4) How does the portable version of FLAC Frontend work?
+Just unzip the zip-file somewhere convenient and run the executable, either
+FLAC frontend-NET20.exe or FLAC frontend-NET40.exe, depending on which
+version of the .NET framework you have installed. If you have .NET 2.0, 3.0
+or 3.5 you should use NET20, if you have .NET 4.0 or 4.5 use NET40. If you
+are not sure, just try both. You can just delete the other file if you
+don't want to have to remember which one is the right one. 
+
 
 
 
