@@ -580,7 +580,7 @@ private: System::Void btnHelp_Click(System::Object^  sender, System::EventArgs^ 
 		 }
 
 private: System::Void btnAbout_Click(System::Object^  sender, System::EventArgs^  e) {
-			 MessageBox::Show("FLAC Frontend v2.0, beta 6, using FLAC 1.3.0pre4","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
+			 MessageBox::Show("FLAC Frontend v2.0, using FLAC 1.3.0","FLAC Frontend version info",MessageBoxButtons::OK,MessageBoxIcon::Information);
 		 }
 
 // ----------------------------------//
