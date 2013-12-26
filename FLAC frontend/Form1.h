@@ -216,7 +216,6 @@ namespace FLACfrontend {
 			// 
 			// dlgAddFile
 			// 
-			this->dlgAddFile->FileName = L"dlgAddFile";
 			this->dlgAddFile->Filter = L"Supported Files|*.wav;*.flac;*.ogg;*.oga;*.aiff;*.w64;*.raw|FLAC files|*.flac|Unc" 
 				L"ompressed files|*.wav;*.w64;*.aiff;*.raw|OGG Files|*.ogg;*.oga";
 			this->dlgAddFile->Multiselect = true;
@@ -650,7 +649,7 @@ private: System::Void btnEncode_Click(System::Object^  sender, System::EventArgs
 			 if(chkReplayGain->Checked == true && chkReplayGainAlbum->Checked == false)
 				 args += "--replay-gain ";
 			 if(!String::IsNullOrEmpty(AdvDialog->txtCuesheet->Text))
-				 args += "--cuesheet " + AdvDialog->txtCuesheet->Text + " ";
+				 args += "--cuesheet \"" + AdvDialog->txtCuesheet->Text + "\" ";
 			 args += AdvDialog->txtCommandLine->Text + " ";
 
 			 // Get console ready and populate proces
