@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='FLAC Frontend' Id='B1615F2A-105F-48FD-AA3E-0BDF8B3EE644' UpgradeCode='BE441FF1-7C48-4A53-80FC-E7A8DB9E1821'
-    Language='1033' Codepage='1252' Version='2.0.6' Manufacturer='Xiph.org'>
+  <Product Name='FLAC Frontend' Id='315E5E8B-0560-413A-B604-622A4C8BECBD' UpgradeCode='BE441FF1-7C48-4A53-80FC-E7A8DB9E1821'
+    Language='1033' Codepage='1252' Version='2.1.1' Manufacturer='Xiph.org'>
 
     <Package Id='*' Keywords='Installer' Description="FLAC Frontend Installer" InstallScope="perMachine"
       Manufacturer='Xiph.org' InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
