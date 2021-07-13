@@ -113,7 +113,7 @@ void cb_child_watch( GPid  pid, gint status, spawn_data *data )
 	FILE *ferr=NULL;
 	char buff[255] = {0};
 	char ignore[1024];
-	int input, counter = 0, skiplines = 6, countlines = 0;
+	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
 
 	gtk_tree_model_get_iter(treemodel,&iter,treepath);
 
@@ -125,12 +125,38 @@ void cb_child_watch( GPid  pid, gint status, spawn_data *data )
 		if(input == '\n'){\
 			break;
 		}else if(input == '\b')
-			counter--;
+			if(backspacefound){
+				if(counter > 0)
+					counter--;
+			}else{
+				// Emtpy buffer up until this point
+				backspacefound = 1;
+				for(int i = 0; i < 255; i++)
+					buff[i] = 0;
+				counter = 0;
+			}
+				
 		else{
 			buff[counter] = input;
 			counter++;
 		}
 	}
+
+	// If we haven't found a backspace up until this point, 
+	// strip the filename
+	if(!backspacefound){
+		int i,j;
+		for(i = 255; i > -1; i--)
+			if(buff[i] == ':')
+				break;
+		
+		// Found a :, now remove front part
+		for(j = 0; j < i; j++)
+			buff[j] = buff[i+j];
+		for(; j < 255; j++)
+			buff[j] = 0;
+	}
+	
 	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
 
     /* Close pid */
