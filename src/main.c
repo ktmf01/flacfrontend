@@ -105,6 +105,38 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 						   &err);
 }
 
+void cb_child_watch( GPid  pid, gint status, spawn_data *data )
+{
+	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
+	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
+	GtkTreeIter iter;
+	FILE *ferr=NULL;
+	char buff[255] = {0};
+	char ignore[1024];
+	int input, counter = 0, skiplines = 6, countlines = 0;
+
+	gtk_tree_model_get_iter(treemodel,&iter,treepath);
+
+	ferr = fdopen(data->err, "r");
+	for(countlines = 0; countlines < skiplines; countlines++)
+		fgets(ignore, sizeof(ignore), ferr);
+
+	while((input = fgetc(ferr)) > 0 && counter < 254){
+		if(input == '\n'){\
+			break;
+		}else if(input == '\b')
+			counter--;
+		else{
+			buff[counter] = input;
+			counter++;
+		}
+	}
+	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
+
+    /* Close pid */
+    g_spawn_close_pid( pid );
+}
+
 void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
@@ -120,11 +152,16 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 		{
 			gchar *launch[] = {command, mode, g_value_get_string(&value), NULL};
 
-			g_spawn_async_with_pipes(NULL,
+			if(!g_spawn_async_with_pipes(NULL,
 								   launch,
 								   NULL,
 								   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
-								   NULL, &data->pid, NULL, NULL, &data->err, NULL );
+								   NULL, &data->pid, NULL, NULL, &data->err, NULL )){
+				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Fail",-1);
+			}else{
+				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"0%",-1);
+				g_child_watch_add(data->pid, (GChildWatchFunc)cb_child_watch, data );
+			}
 		}
 	}else{
 		abort();
