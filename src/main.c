@@ -4,6 +4,9 @@ typedef struct {
 	GtkTreeRowReference *row;
 	gint err;
 	GPid pid;
+	guint timeout;
+	int output_trimmed;
+	int output_done;
 } spawn_data;
 
 typedef struct {
@@ -105,60 +108,100 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 						   &err);
 }
 
-void cb_child_watch( GPid  pid, gint status, spawn_data *data )
+int process_stderr(spawn_data *data, char (*output)[255]){
+	char ignore[1024];
+	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
+	FILE *ferr=NULL;
+
+	ferr = fdopen(data->err, "r");
+
+	if(data->output_trimmed){
+		for(countlines = 0; countlines < skiplines; countlines++)
+			fgets(ignore, sizeof(ignore), ferr);
+
+		while((input = fgetc(ferr)) > 0 && counter < 254){
+			if(input == '\n'){
+				data->output_done = 1;
+				break;
+			}else if(input == '\b')
+				if(backspacefound){
+					if(counter > 0)
+						counter--;
+				}else{
+					// Emtpy buffer up until this point
+					backspacefound = 1;
+					for(int i = 0; i < 255; i++)
+						*output[i] = 0;
+					counter = 0;
+				}
+					
+			else{
+				*output[counter] = input;
+				counter++;
+			}
+		}
+
+		// If we haven't found a backspace up until this point, 
+		// strip the filename
+		if(!backspacefound){
+			int i,j;
+			for(i = 255; i > -1; i--)
+				if(*output[i] == ':')
+					break;
+			
+			// Found a :, now remove front part
+			for(j = 0; j < i; j++)
+				*output[j] = *output[i+j];
+			for(; j < 255; j++)
+				*output[j] = 0;
+		}
+	}else if(!data->output_done){
+		while((input = fgetc(ferr)) > 0 && counter < 254){
+			if(input == '\n'){
+				data->output_done = 1;
+				break;
+			}else if(input == '\b'){
+				if(counter > 0)
+					counter--;		
+			}else{
+				*output[counter] = input;
+				counter++;
+			}
+		}		
+	}
+	
+	fclose(ferr);
+	if(counter == 0)
+		return 0;
+	else
+		return 1;
+}
+
+void callback_child_500ms(spawn_data *data){
+	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
+	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
+	GtkTreeIter iter;
+	char buff[255] = {0};
+
+	if(process_stderr(data, &buff)){
+		gtk_tree_model_get_iter(treemodel,&iter,treepath);
+		gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
+	}
+}
+
+void callback_child_exit( GPid  pid, gint status, spawn_data *data )
 {
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
 	GtkTreeIter iter;
-	FILE *ferr=NULL;
 	char buff[255] = {0};
-	char ignore[1024];
-	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
+
+	process_stderr(data, &buff);
 
 	gtk_tree_model_get_iter(treemodel,&iter,treepath);
-
-	ferr = fdopen(data->err, "r");
-	for(countlines = 0; countlines < skiplines; countlines++)
-		fgets(ignore, sizeof(ignore), ferr);
-
-	while((input = fgetc(ferr)) > 0 && counter < 254){
-		if(input == '\n'){\
-			break;
-		}else if(input == '\b')
-			if(backspacefound){
-				if(counter > 0)
-					counter--;
-			}else{
-				// Emtpy buffer up until this point
-				backspacefound = 1;
-				for(int i = 0; i < 255; i++)
-					buff[i] = 0;
-				counter = 0;
-			}
-				
-		else{
-			buff[counter] = input;
-			counter++;
-		}
-	}
-
-	// If we haven't found a backspace up until this point, 
-	// strip the filename
-	if(!backspacefound){
-		int i,j;
-		for(i = 255; i > -1; i--)
-			if(buff[i] == ':')
-				break;
-		
-		// Found a :, now remove front part
-		for(j = 0; j < i; j++)
-			buff[j] = buff[i+j];
-		for(; j < 255; j++)
-			buff[j] = 0;
-	}
-	
 	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
 
+    g_source_remove(data->timeout);
     /* Close pid */
     g_spawn_close_pid( pid );
 }
@@ -176,7 +219,7 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 
 
 		{
-			gchar *launch[] = {command, mode, g_value_get_string(&value), NULL};
+			gchar *launch[] = {command, mode, g_value_dup_string(&value), NULL};
 
 			if(!g_spawn_async_with_pipes(NULL,
 								   launch,
@@ -185,8 +228,9 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 								   NULL, &data->pid, NULL, NULL, &data->err, NULL )){
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Fail",-1);
 			}else{
-				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"0%",-1);
-				g_child_watch_add(data->pid, (GChildWatchFunc)cb_child_watch, data );
+				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Started",-1);
+				g_child_watch_add(data->pid, (GChildWatchFunc)callback_child_exit, data );
+				data->timeout = g_timeout_add(500,(GSourceFunc)callback_child_500ms, data);
 			}
 		}
 	}else{
@@ -205,7 +249,9 @@ G_MODULE_EXPORT void on_btn_test_clicked(GtkButton *button, app_widgets *widgets
 	rowreference = gtk_tree_row_reference_new(GTK_TREE_MODEL(widgets->liststore_files),path);
 	if(rowreference != NULL){
 		widgets->process[0].row = rowreference;
+		widgets->process[0].output_trimmed = 0;
 		spawn_process(&widgets->process[0],"flac","-t");
+		
 	}
 }
 
