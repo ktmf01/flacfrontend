@@ -108,23 +108,26 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
-	GtkTreeIter *iter;
-	GValue *value;
+	GtkTreeIter iter;
+	GValue value = G_VALUE_INIT;
 
-	gtk_tree_model_get_iter(treemodel,iter,treepath);
-	gtk_tree_model_get_value(treemodel,iter,0,value);
+	if(gtk_tree_model_get_iter(treemodel,&iter,treepath)){
+		gtk_tree_model_get_value(treemodel,&iter,0,&value);
 
-	// Find the current row
+		// Find the current row
 
 
-	{
-		gchar *launch[] = {command, mode, NULL};
+		{
+			gchar *launch[] = {command, mode, g_value_get_string(&value), NULL};
 
-		g_spawn_async_with_pipes(NULL,
-							   launch,
-							   NULL,
-							   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
-							   NULL, &data->pid, NULL, NULL, &data->err, NULL );
+			g_spawn_async_with_pipes(NULL,
+								   launch,
+								   NULL,
+								   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
+								   NULL, &data->pid, NULL, NULL, &data->err, NULL );
+		}
+	}else{
+		abort();
 	}
 }
 
