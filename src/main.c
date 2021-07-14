@@ -2,11 +2,13 @@
 
 typedef struct {
 	GtkTreeRowReference *row;
-	gint err;
+	FILE *fstderr;
 	GPid pid;
 	guint timeout;
 	int output_trimmed;
 	int output_done;
+	char output_buffer[64];
+	int output_buffer_pointer;
 } spawn_data;
 
 typedef struct {
@@ -108,12 +110,12 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 						   &err);
 }
 
-int process_stderr(spawn_data *data, char *output){
+int process_stderr_old(spawn_data *data, char *output){
 	char ignore[1024];
 	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
 	FILE *ferr=NULL;
 
-	ferr = fdopen(data->err, "r");
+//	ferr = fdopen(data->err, "r");
 
 	if(!data->output_trimmed){
 		for(countlines = 0; countlines < skiplines; countlines++)
@@ -171,11 +173,39 @@ int process_stderr(spawn_data *data, char *output){
 		}		
 	}
 	
-	fclose(ferr);
 	if(counter < 5)
 		return 0;
 	else
 		return 1;
+}
+
+void process_stderr(spawn_data *data){
+	char c;
+	char temp[64]; 
+	int i = 0;
+
+	while((c = fgetc(data->fstderr)) != EOF && i < 2000){
+		if(c == '\b'){
+			data->output_buffer_pointer--;
+		}else if(c > 32 && c < 128){
+			data->output_buffer[data->output_buffer_pointer] = c;
+			data->output_buffer_pointer++;
+		}	
+		if(data->output_buffer_pointer < 0)
+			data->output_buffer_pointer += 64;
+		else if(data->output_buffer_pointer > 63)
+			data->output_buffer_pointer -= 64;
+		i++;
+	}
+	
+	// Copy data up until pointer to temp
+	for(i = 0; i < data->output_buffer_pointer; i++)
+		temp[i] = data->output_buffer[i];
+	for(i = 0; i < data->output_buffer_pointer; i++)
+		data->output_buffer[i] = data->output_buffer[i+data->output_buffer_pointer];
+	for(; i < 64; i++)	
+		data->output_buffer[i] = temp[i-data->output_buffer_pointer];
+	data->output_buffer_pointer = 0;
 }
 
 gboolean callback_child_500ms(spawn_data *data){
@@ -184,16 +214,9 @@ gboolean callback_child_500ms(spawn_data *data){
 	GtkTreeIter iter;
 	char buff[255] = {0};
 
-	if(process_stderr(data, buff)){
-		gtk_tree_model_get_iter(treemodel,&iter,treepath);
-		gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
-	}else{
-		buff[0] =  (rand() % 20)+66;
-		buff[1] =  (rand() % 20)+66;
-		buff[2] =  (rand() % 20)+66;
-		gtk_tree_model_get_iter(treemodel,&iter,treepath);
-		gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
-	}
+	process_stderr(data);
+	gtk_tree_model_get_iter(treemodel,&iter,treepath);
+	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer,-1);
 	
 	return G_SOURCE_CONTINUE;
 }
@@ -204,12 +227,13 @@ void callback_child_exit( GPid  pid, gint status, spawn_data *data ){
 	GtkTreeIter iter;
 	char buff[255] = {0};
 
-	if(process_stderr(data, buff)){
-		gtk_tree_model_get_iter(treemodel,&iter,treepath);
-		gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,buff,-1);
-	}
+	process_stderr(data);
+	gtk_tree_model_get_iter(treemodel,&iter,treepath);
+	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer,-1);
+
 
     g_source_remove(data->timeout);
+    fclose(data->fstderr);
     /* Close pid */
     g_spawn_close_pid( pid );
 }
@@ -218,6 +242,7 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
 	GtkTreeIter iter;
+	gint fd_stderr;
 	GValue value = G_VALUE_INIT;
 
 	if(gtk_tree_model_get_iter(treemodel,&iter,treepath)){
@@ -233,16 +258,15 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 								   launch,
 								   NULL,
 								   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
-								   NULL, &data->pid, NULL, NULL, &data->err, NULL )){
+								   NULL, &data->pid, NULL, NULL, &fd_stderr, NULL )){
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Fail",-1);
 			}else{
+				data->fstderr = fdopen(fd_stderr,"r");
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Started",-1);
 				g_child_watch_add(data->pid, (GChildWatchFunc)callback_child_exit, data );
 				data->timeout = g_timeout_add(1000,(GSourceFunc)callback_child_500ms, data);
 			}
 		}
-	}else{
-		abort();
 	}
 }
 
