@@ -7,8 +7,10 @@ typedef struct {
 	guint timeout;
 	int output_trimmed;
 	int output_done;
-	char output_buffer[64];
+	gunichar output_buffer[64];
+	char output_buffer_utf8[64];
 	int output_buffer_pointer;
+	GString output_buffer_string;
 } spawn_data;
 
 typedef struct {
@@ -109,7 +111,7 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 						   &exit_state,
 						   &err);
 }
-
+/*
 int process_stderr_old(spawn_data *data, char *output){
 	char ignore[1024];
 	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
@@ -201,39 +203,123 @@ void process_stderr(spawn_data *data){
 	// Copy data up until pointer to temp
 	for(i = 0; i < data->output_buffer_pointer; i++)
 		temp[i] = data->output_buffer[i];
-	for(i = 0; i < data->output_buffer_pointer; i++)
+	for(i = 0; i < 64 - data->output_buffer_pointer; i++)
 		data->output_buffer[i] = data->output_buffer[i+data->output_buffer_pointer];
 	for(; i < 64; i++)	
-		data->output_buffer[i] = temp[i-data->output_buffer_pointer];
+		data->output_buffer[i] = temp[64-i+data->output_buffer_pointer];
 	data->output_buffer_pointer = 0;
-}
+}*/
 
-gboolean callback_child_500ms(spawn_data *data){
+void write_progress_to_treeview(spawn_data *data){
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
 	GtkTreeIter iter;
-	char buff[255] = {0};
 
-	process_stderr(data);
 	gtk_tree_model_get_iter(treemodel,&iter,treepath);
-	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer,-1);
+	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer_string.str,-1);
+	fprintf(stderr,"OUTPUT: %s\n",data->output_buffer_string.str);
+}
+
+gboolean cb_err_watch_old(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
+	gunichar c;
+	gunichar temp[64]; 
+	int i = 0, j;
+    if( cond != G_IO_IN )
+    {
+        g_io_channel_unref( channel );
+        return FALSE;
+    }
+
+	while(g_io_channel_read_unichar(channel, &c, NULL) == G_IO_STATUS_NORMAL && i < 200){
+		if(c == '\b'){
+			data->output_buffer_pointer--;
+		}else if(c > 32 && c < 128){
+			data->output_buffer[data->output_buffer_pointer] = c;
+			data->output_buffer_pointer++;
+		}	
+		if(data->output_buffer_pointer < 0)
+			data->output_buffer_pointer += 64;
+		else if(data->output_buffer_pointer > 63)
+			data->output_buffer_pointer -= 64;
+		i++;
+	}
 	
-	return G_SOURCE_CONTINUE;
+	// Reorder data so last recorded gunichar is at data->output_buffer[63]
+	for(i = 0; i < data->output_buffer_pointer; i++)
+		temp[i] = data->output_buffer[i];
+	for(i = 0; i < 64 - data->output_buffer_pointer; i++)
+		data->output_buffer[i] = data->output_buffer[i+data->output_buffer_pointer];
+	for(; i < 64; i++)	
+		data->output_buffer[i] = temp[64-i+data->output_buffer_pointer];
+	data->output_buffer_pointer = 0;
+	
+	
+	// Reset first 8 characters of data->output_buffer_utf8
+	for(i=0; i <8; i++)
+		data->output_buffer_utf8[i] = ' ';
+	
+	// Convert data to UTF-8
+	for(i=63, j=64; i >= 0; i--){
+		j -= g_unichar_to_utf8(data->output_buffer[i],NULL);
+		if(j < 0)
+			break;
+		g_unichar_to_utf8(data->output_buffer[i], data->output_buffer_utf8+j);
+	}
+	
+	write_progress_to_treeview(data);
+	
+	return TRUE;
+}
+
+gboolean cb_err_watch_old2(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
+
+    if( cond != G_IO_IN )
+    {
+        g_io_channel_unref( channel );
+        return FALSE;
+    }
+	g_io_channel_seek_position(channel, 0, G_SEEK_END, NULL);
+	g_io_channel_seek_position(channel, -30, G_SEEK_END, NULL);
+	g_io_channel_read_chars(channel, data->output_buffer_utf8,64,NULL,NULL);
+	
+	write_progress_to_treeview(data);
+	
+	return TRUE;
+}
+
+gboolean cb_err_watch(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
+	gunichar c;
+    if( cond != G_IO_IN )
+    {
+        g_io_channel_unref( channel );
+        return FALSE;
+    }
+
+	while(g_io_channel_read_unichar(channel, &c, NULL) == G_IO_STATUS_NORMAL){
+		if(c == '\b'){			
+			g_string_truncate(&data->output_buffer_string,0);
+		}else
+			g_string_append_unichar(&data->output_buffer_string, c);
+	}
+	
+	// Leave last 48 characters
+	//g_string_erase(&data->output_buffer_string,0,data->output_buffer_string.len-48);
+	// Check for halfway cut UTF-8
+	//if((data->output_buffer_string.str[0] & 0b11000000) == 0b10000000)
+	//	g_string_erase(&data->output_buffer_string,0,1);
+
+	
+	write_progress_to_treeview(data);
+	
+	return TRUE;
 }
 
 void callback_child_exit( GPid  pid, gint status, spawn_data *data ){
-	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
-	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
-	GtkTreeIter iter;
-	char buff[255] = {0};
-
-	process_stderr(data);
-	gtk_tree_model_get_iter(treemodel,&iter,treepath);
-	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer,-1);
+	write_progress_to_treeview(data);
 
 
-    g_source_remove(data->timeout);
-    fclose(data->fstderr);
+//    g_source_remove(data->timeout);
+//    fclose(data->fstderr);
     /* Close pid */
     g_spawn_close_pid( pid );
 }
@@ -243,6 +329,7 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 	GtkTreePath *treepath = gtk_tree_row_reference_get_path (data->row);
 	GtkTreeIter iter;
 	gint fd_stderr;
+	GIOChannel *err_ch;
 	GValue value = G_VALUE_INIT;
 
 	if(gtk_tree_model_get_iter(treemodel,&iter,treepath)){
@@ -261,10 +348,16 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 								   NULL, &data->pid, NULL, NULL, &fd_stderr, NULL )){
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Fail",-1);
 			}else{
-				data->fstderr = fdopen(fd_stderr,"r");
+				//data->fstderr = fdopen(fd_stderr,"r");
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Started",-1);
 				g_child_watch_add(data->pid, (GChildWatchFunc)callback_child_exit, data );
-				data->timeout = g_timeout_add(1000,(GSourceFunc)callback_child_500ms, data);
+				//data->timeout = g_timeout_add(500,(GSourceFunc)callback_child_500ms, data);
+				#ifdef G_OS_WIN32
+					err_ch = g_io_channel_win32_new_fd( fd_stderr );
+				#else
+					err_ch = g_io_channel_unix_new( fd_stderr );
+				#endif
+				g_io_add_watch( err_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_err_watch, data );
 			}
 		}
 	}
