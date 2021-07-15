@@ -2,15 +2,9 @@
 
 typedef struct {
 	GtkTreeRowReference *row;
-	FILE *fstderr;
 	GPid pid;
 	guint timeout;
-	int output_trimmed;
-	int output_done;
-	gunichar output_buffer[64];
-	char output_buffer_utf8[64];
-	int output_buffer_pointer;
-	GString output_buffer_string;
+	GString output_buffer;
 } spawn_data;
 
 typedef struct {
@@ -111,104 +105,6 @@ G_MODULE_EXPORT void on_btn_encode_clicked(GtkButton *button, app_widgets *widge
 						   &exit_state,
 						   &err);
 }
-/*
-int process_stderr_old(spawn_data *data, char *output){
-	char ignore[1024];
-	int input, counter = 0, skiplines = 6, countlines = 0, backspacefound = 0;
-	FILE *ferr=NULL;
-
-//	ferr = fdopen(data->err, "r");
-
-	if(!data->output_trimmed){
-		for(countlines = 0; countlines < skiplines; countlines++)
-			fgets(ignore, sizeof(ignore), ferr);
-
-		while((input = fgetc(ferr)) > 0 && counter < 254){
-			if(input == '\n'){
-				data->output_done = 1;
-				break;
-			}else if(input == '\b')
-				if(backspacefound){
-					if(counter > 0)
-						counter--;
-				}else{
-					// Emtpy buffer up until this point
-					backspacefound = 1;
-					for(int i = 0; i < 255; i++)
-						output[i] = 0;
-					counter = 0;
-				}
-					
-			else{
-				output[counter] = input;
-				counter++;
-			}
-		}
-
-		// If we haven't found a backspace up until this point, 
-		// strip the filename
-		if(!backspacefound){
-			int i,j;
-			for(i = 255; i > -1; i--)
-				if(output[i] == ':')
-					break;
-			
-			// Found a :, now remove front part
-			for(j = 0; j < i; j++)
-				output[j] = output[i+j];
-			for(; j < 255; j++)
-				output[j] = 0;
-		}
-		data->output_trimmed = 1;
-	}else if(!data->output_done){
-		while((input = fgetc(ferr)) > 0 && counter < 254){
-			if(input == '\n'){
-				data->output_done = 1;
-				break;
-			}else if(input == '\b'){
-				if(counter > 0)
-					counter--;		
-			}else{
-				output[counter] = input;
-				counter++;
-			}
-		}		
-	}
-	
-	if(counter < 5)
-		return 0;
-	else
-		return 1;
-}
-
-void process_stderr(spawn_data *data){
-	char c;
-	char temp[64]; 
-	int i = 0;
-
-	while((c = fgetc(data->fstderr)) != EOF && i < 2000){
-		if(c == '\b'){
-			data->output_buffer_pointer--;
-		}else if(c > 32 && c < 128){
-			data->output_buffer[data->output_buffer_pointer] = c;
-			data->output_buffer_pointer++;
-		}	
-		if(data->output_buffer_pointer < 0)
-			data->output_buffer_pointer += 64;
-		else if(data->output_buffer_pointer > 63)
-			data->output_buffer_pointer -= 64;
-		i++;
-	}
-	
-	// Copy data up until pointer to temp
-	for(i = 0; i < data->output_buffer_pointer; i++)
-		temp[i] = data->output_buffer[i];
-	for(i = 0; i < 64 - data->output_buffer_pointer; i++)
-		data->output_buffer[i] = data->output_buffer[i+data->output_buffer_pointer];
-	for(; i < 64; i++)	
-		data->output_buffer[i] = temp[64-i+data->output_buffer_pointer];
-	data->output_buffer_pointer = 0;
-}*/
 
 void write_progress_to_treeview(spawn_data *data){
 	GtkTreeModel *treemodel = gtk_tree_row_reference_get_model(data->row);
@@ -216,78 +112,10 @@ void write_progress_to_treeview(spawn_data *data){
 	GtkTreeIter iter;
 
 	gtk_tree_model_get_iter(treemodel,&iter,treepath);
-	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer_string.str,-1);
-	fprintf(stderr,"OUTPUT: %s\n",data->output_buffer_string.str);
+	gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,data->output_buffer.str,-1);
 }
 
-gboolean cb_err_watch_old(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
-	gunichar c;
-	gunichar temp[64]; 
-	int i = 0, j;
-    if( cond != G_IO_IN )
-    {
-        g_io_channel_unref( channel );
-        return FALSE;
-    }
-
-	while(g_io_channel_read_unichar(channel, &c, NULL) == G_IO_STATUS_NORMAL && i < 200){
-		if(c == '\b'){
-			data->output_buffer_pointer--;
-		}else if(c > 32 && c < 128){
-			data->output_buffer[data->output_buffer_pointer] = c;
-			data->output_buffer_pointer++;
-		}	
-		if(data->output_buffer_pointer < 0)
-			data->output_buffer_pointer += 64;
-		else if(data->output_buffer_pointer > 63)
-			data->output_buffer_pointer -= 64;
-		i++;
-	}
-	
-	// Reorder data so last recorded gunichar is at data->output_buffer[63]
-	for(i = 0; i < data->output_buffer_pointer; i++)
-		temp[i] = data->output_buffer[i];
-	for(i = 0; i < 64 - data->output_buffer_pointer; i++)
-		data->output_buffer[i] = data->output_buffer[i+data->output_buffer_pointer];
-	for(; i < 64; i++)	
-		data->output_buffer[i] = temp[64-i+data->output_buffer_pointer];
-	data->output_buffer_pointer = 0;
-	
-	
-	// Reset first 8 characters of data->output_buffer_utf8
-	for(i=0; i <8; i++)
-		data->output_buffer_utf8[i] = ' ';
-	
-	// Convert data to UTF-8
-	for(i=63, j=64; i >= 0; i--){
-		j -= g_unichar_to_utf8(data->output_buffer[i],NULL);
-		if(j < 0)
-			break;
-		g_unichar_to_utf8(data->output_buffer[i], data->output_buffer_utf8+j);
-	}
-	
-	write_progress_to_treeview(data);
-	
-	return TRUE;
-}
-
-gboolean cb_err_watch_old2(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
-
-    if( cond != G_IO_IN )
-    {
-        g_io_channel_unref( channel );
-        return FALSE;
-    }
-	g_io_channel_seek_position(channel, 0, G_SEEK_END, NULL);
-	g_io_channel_seek_position(channel, -30, G_SEEK_END, NULL);
-	g_io_channel_read_chars(channel, data->output_buffer_utf8,64,NULL,NULL);
-	
-	write_progress_to_treeview(data);
-	
-	return TRUE;
-}
-
-gboolean cb_err_watch(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
+gboolean cb_flac_output_watch(GIOChannel *channel, GIOCondition  cond, spawn_data *data ){
 	gunichar c;
     if( cond != G_IO_IN )
     {
@@ -297,16 +125,16 @@ gboolean cb_err_watch(GIOChannel *channel, GIOCondition  cond, spawn_data *data 
 
 	while(g_io_channel_read_unichar(channel, &c, NULL) == G_IO_STATUS_NORMAL){
 		if(c == '\b'){			
-			g_string_truncate(&data->output_buffer_string,0);
+			g_string_truncate(&data->output_buffer,0);
 		}else
-			g_string_append_unichar(&data->output_buffer_string, c);
+			g_string_append_unichar(&data->output_buffer, c);
 	}
 	
 	// Leave last 48 characters
-	//g_string_erase(&data->output_buffer_string,0,data->output_buffer_string.len-48);
+	//g_string_erase(&data->output_buffer,0,data->output_buffer.len-48);
 	// Check for halfway cut UTF-8
-	//if((data->output_buffer_string.str[0] & 0b11000000) == 0b10000000)
-	//	g_string_erase(&data->output_buffer_string,0,1);
+	//if((data->output_buffer.str[0] & 0b11000000) == 0b10000000)
+	//	g_string_erase(&data->output_buffer,0,1);
 
 	
 	write_progress_to_treeview(data);
@@ -314,12 +142,9 @@ gboolean cb_err_watch(GIOChannel *channel, GIOCondition  cond, spawn_data *data 
 	return TRUE;
 }
 
-void callback_child_exit( GPid  pid, gint status, spawn_data *data ){
+void cb_flac_exit( GPid  pid, gint status, spawn_data *data ){
 	write_progress_to_treeview(data);
 
-
-//    g_source_remove(data->timeout);
-//    fclose(data->fstderr);
     /* Close pid */
     g_spawn_close_pid( pid );
 }
@@ -335,9 +160,6 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 	if(gtk_tree_model_get_iter(treemodel,&iter,treepath)){
 		gtk_tree_model_get_value(treemodel,&iter,0,&value);
 
-		// Find the current row
-
-
 		{
 			gchar *launch[] = {command, mode, g_value_dup_string(&value), NULL};
 
@@ -348,16 +170,15 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 								   NULL, &data->pid, NULL, NULL, &fd_stderr, NULL )){
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Fail",-1);
 			}else{
-				//data->fstderr = fdopen(fd_stderr,"r");
 				gtk_list_store_set(GTK_LIST_STORE(treemodel),&iter,1,"Started",-1);
-				g_child_watch_add(data->pid, (GChildWatchFunc)callback_child_exit, data );
-				//data->timeout = g_timeout_add(500,(GSourceFunc)callback_child_500ms, data);
+				g_child_watch_add(data->pid, (GChildWatchFunc)cb_flac_exit, data );
 				#ifdef G_OS_WIN32
 					err_ch = g_io_channel_win32_new_fd( fd_stderr );
 				#else
 					err_ch = g_io_channel_unix_new( fd_stderr );
 				#endif
-				g_io_add_watch( err_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_err_watch, data );
+				g_io_channel_set_flags(err_ch, G_IO_FLAG_NONBLOCK, NULL);
+				g_io_add_watch( err_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_flac_output_watch, data );
 			}
 		}
 	}
@@ -365,19 +186,14 @@ void spawn_process(spawn_data *data, gchar *command, gchar *mode){
 
 G_MODULE_EXPORT void on_btn_test_clicked(GtkButton *button, app_widgets *widgets)
 {
-//	gboolean result;
 	GtkTreePath *path;
 	GtkTreeRowReference *rowreference;
-
 
 	path = gtk_tree_path_new_first();
 	rowreference = gtk_tree_row_reference_new(GTK_TREE_MODEL(widgets->liststore_files),path);
 	if(rowreference != NULL){
 		widgets->process[0].row = rowreference;
-		widgets->process[0].output_trimmed = 0;
-		widgets->process[0].output_done = 0;
 		spawn_process(&widgets->process[0],"flac","-t");
-		
 	}
 }
 
