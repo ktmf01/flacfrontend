@@ -1,0 +1,10 @@
+*~
+*.a
+*.la
+*.lo
+*.o
+*.so
+*.dll
+*.dylib
+*.exe
+flacfrontend
